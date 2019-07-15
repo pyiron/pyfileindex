@@ -28,7 +28,7 @@ setup(
 
     keywords='pyfileindex',
     packages=find_packages(exclude=["*tests*"]),
-    install_requires=['pandas'],
+    install_requires=['pandas', 'scandir'],
     data_files=[("", ["LICENSE"])],
     cmdclass=versioneer.get_cmdclass(),
     )

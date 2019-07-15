@@ -1,6 +1,10 @@
 import numpy as np
 import pandas
 import os
+try:
+    from os import scandir
+except ImportError:
+    from scandir import scandir
 
 
 class PyFileIndex(object):
@@ -60,7 +64,7 @@ class PyFileIndex(object):
             list: list of file entries
         """
         if df is not None and len(df) > 0:
-            for entry in os.scandir(path):
+            for entry in scandir(path):
                 if entry.path not in df.path.values:
                     if entry.is_dir(follow_symlinks=False) and recursive:
                         # yield from self._scandir(path=entry.path, df=df, recursive=recursive)  # Python 3.X only
@@ -70,7 +74,7 @@ class PyFileIndex(object):
                     else:
                         yield self._get_lst_entry(entry=entry)
         else:
-            for entry in os.scandir(path):
+            for entry in scandir(path):
                 if entry.is_dir(follow_symlinks=False) and recursive:
                     # yield from self._scandir(path=entry.path, recursive=recursive)  # Python 3.X only
                     for d in self._scandir(path=entry.path, df=df, recursive=recursive):
