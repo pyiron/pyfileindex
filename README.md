@@ -6,7 +6,7 @@ PyFileIndex - pythonic file system index
 [![Build status](https://ci.appveyor.com/api/projects/status/n13j4aous9wohncy/branch/master?svg=true)](https://ci.appveyor.com/project/jan-janssen/pyfileindex/branch/master)
 [![Coverage Status](https://coveralls.io/repos/github/pyfileindex/pyfileindex/badge.svg?branch=master)](https://coveralls.io/github/pyfileindex/pyfileindex?branch=master)
 
-The pyfileindex helps to keep track of files in a specific directory, to monitor added files, modified files and deleted files.
+The pyfileindex helps to keep track of files in a specific directory, to monitor added files, modified files and deleted files. The module is compatible with Python 2.7-3.7 but restricted to Unix-like system - Windows is not supported. 
 
 # Installation
 The pyfileindex can either be installed via pip using:
