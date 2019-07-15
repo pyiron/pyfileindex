@@ -5,12 +5,12 @@ from setuptools import setup, find_packages
 import versioneer
 
 setup(
-    name='fileindex',
+    name='pyfileindex',
     version=versioneer.get_version(),
-    description='fileindex - dynamic file system index',
-    long_description='File index.',
+    description='pyfileindex - pythonic file system index',
+    long_description='pyfileindex creates a dynamic file system index inside a pandas DataFrame.',
 
-    url='https://github.com/pysqa/pysqa',
+    url='https://github.com/pyfileindex/pyfileindex',
     author='Jan Janssen',
     author_email='janssen@mpie.de',
     license='BSD',
@@ -20,14 +20,13 @@ setup(
                  'License :: OSI Approved :: BSD License',
                  'Intended Audience :: Science/Research',
                  'Operating System :: OS Independent',
-                 'Programming Language :: Python :: 2.7',
                  'Programming Language :: Python :: 3',
                  'Programming Language :: Python :: 3.4',
                  'Programming Language :: Python :: 3.5',
                  'Programming Language :: Python :: 3.6',
                  'Programming Language :: Python :: 3.7'],
 
-    keywords='pysqa',
+    keywords='pyfileindex',
     packages=find_packages(exclude=["*tests*"]),
     install_requires=['pandas'],
     data_files=[("", ["LICENSE"])],

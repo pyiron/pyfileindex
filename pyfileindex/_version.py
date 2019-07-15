@@ -41,9 +41,9 @@ def get_config():
     cfg = VersioneerConfig()
     cfg.VCS = "git"
     cfg.style = "pep440-pre"
-    cfg.tag_prefix = "fileindex-"
-    cfg.parentdir_prefix = "fileindex"
-    cfg.versionfile_source = "fileindex/_version.py"
+    cfg.tag_prefix = "pyfileindex-"
+    cfg.parentdir_prefix = "pyfileindex"
+    cfg.versionfile_source = "pyfileindex/_version.py"
     cfg.verbose = False
     return cfg
 

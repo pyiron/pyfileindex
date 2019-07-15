@@ -1,11 +1,12 @@
 import numpy as np
 import pandas
 import os
+import sys
 
 
-class FileIndex(object):
+class PyFileIndex(object):
     """
-    The FileIndex maintains a pandas Dataframe to track changes in the file system.
+    The PyFileIndex maintains a pandas Dataframe to track changes in the file system.
 
     Args:
         path (str): file system path
@@ -13,7 +14,6 @@ class FileIndex(object):
         debug (bool): enable debug print statements
     """
     def __init__(self, path='.', filter_function=None, debug=False):
-
         self._debug = debug
         self._filter_function = filter_function
         path = os.path.abspath(path)
@@ -64,7 +64,11 @@ class FileIndex(object):
             for entry in os.scandir(path):
                 if entry.path not in df.path.values:
                     if entry.is_dir(follow_symlinks=False) and recursive:
-                        yield from self._scandir(path=entry.path, df=df, recursive=recursive)
+                        if sys.version_info > (3, 0):
+                            yield from self._scandir(path=entry.path, df=df, recursive=recursive)
+                        else:
+                            for d in self._scandir(path=entry.path, df=df, recursive=recursive):
+                                yield d
                         yield self._get_lst_entry(entry=entry)
                     else:
                         yield self._get_lst_entry(entry=entry)

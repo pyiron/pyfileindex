@@ -1,6 +1,6 @@
 import unittest
 import os
-from fileindex import FileIndex
+from pyfileindex import PyFileIndex
 
 
 def filter_function(file_name):
@@ -15,9 +15,9 @@ def touch(fname, times=None):
 class TestJobFileTable(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.fi_with_filter = FileIndex(path='.', filter_function=filter_function)
-        cls.fi_without_filter = FileIndex(path='.')
-        cls.fi_debug = FileIndex(path='.', filter_function=filter_function, debug=True)
+        cls.fi_with_filter = PyFileIndex(path='.', filter_function=filter_function)
+        cls.fi_without_filter = PyFileIndex(path='.')
+        cls.fi_debug = PyFileIndex(path='.', filter_function=filter_function, debug=True)
 
     def test_project_single_empty_dir(self):
         p_name = 'test_project_single_empty_dir'
