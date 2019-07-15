@@ -28,7 +28,7 @@ matrix:
         - conda info -a
         - conda config --set always_yes yes --set changeps1 no
         - conda update -q conda
-        - conda install -y -c conda-forge python=${PYTHONVER} coverage pandas
+        - conda install -y -c conda-forge python=${PYTHONVER} coveralls coverage pandas
         - pip install --pre .
       script:
         - coverage run --omit pyfileindex/_version.py -m unittest discover tests
