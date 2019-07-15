@@ -24,7 +24,7 @@ class TestJobFileTable(unittest.TestCase):
         fi_with_filter_lst = self.fi_with_filter.dataframe.path.values
         fi_without_filter_lst = self.fi_without_filter.dataframe.path.values
         fi_debug_lst = self.fi_debug.dataframe.path.values
-        os.makedirs(p_name, exist_ok=True)
+        os.makedirs(p_name)
         self.fi_with_filter.update()
         self.fi_without_filter.update()
         self.fi_debug.update()
@@ -53,7 +53,7 @@ class TestJobFileTable(unittest.TestCase):
         fi_with_filter_lst = self.fi_with_filter.dataframe.path.values
         fi_without_filter_lst = self.fi_without_filter.dataframe.path.values
         fi_debug_lst = self.fi_debug.dataframe.path.values
-        os.makedirs(p_name, exist_ok=True)
+        os.makedirs(p_name)
         touch(os.path.join(p_name, 'test.txt'))
         touch(os.path.join(p_name, 'test.o'))
         self.fi_with_filter.update()
@@ -90,7 +90,7 @@ class TestJobFileTable(unittest.TestCase):
         fi_with_filter_lst = self.fi_with_filter.dataframe.path.values
         fi_without_filter_lst = self.fi_without_filter.dataframe.path.values
         fi_debug_lst = self.fi_debug.dataframe.path.values
-        os.makedirs(p_name, exist_ok=True)
+        os.makedirs(p_name)
         touch(os.path.join(p_name, 'test.txt'))
         touch(os.path.join(p_name, 'test.o'))
         self.fi_with_filter.update()
@@ -136,7 +136,7 @@ class TestJobFileTable(unittest.TestCase):
         fi_with_filter_lst = self.fi_with_filter.dataframe.path.values
         fi_without_filter_lst = self.fi_without_filter.dataframe.path.values
         fi_debug_lst = self.fi_debug.dataframe.path.values
-        os.makedirs(p_name, exist_ok=True)
+        os.makedirs(p_name)
         touch(os.path.join(p_name, 'test.txt'))
         self.fi_with_filter.update()
         self.fi_without_filter.update()
