@@ -39,13 +39,13 @@ matrix:
         - python-codacy-coverage -r coverage.xml
       deploy:
         - provider: pypi
-          user: pyiron
+          user: jan-janssen
           password: ${PYPI_UPLOAD_TOKEN}
           allow_failure: true
           on:
             branch: master
         - provider: pypi
-          user: pyiron
+          user: jan-janssen
           password: ${PYPI_UPLOAD_TOKEN}
           allow_failure: true
           on:
