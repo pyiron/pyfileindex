@@ -1,0 +1,10 @@
+if [ -d "notebooks" ]; then
+    mv notebooks/* .
+fi
+if [ -d "${HOME}/pyfileindex" ]; then
+    rm -r ${HOME}/binder ${HOME}/pyfileindex ${HOME}/tests ${HOME}/notebooks
+    rm ${HOME}/.travis.yml ${HOME}/appveyor.yml ${HOME}/LICENSE ${HOME}/MANIFEST.in ${HOME}/setup.cfg ${HOME}/setup.py ${HOME}/versioneer.py
+fi
+if [ -f "${HOME}/README.md" ]; then
+    rm ${HOME}/README.md
+fi

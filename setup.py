@@ -28,7 +28,7 @@ setup(
                  'Programming Language :: Python :: 3.7'],
 
     keywords='pyfileindex',
-    packages=find_packages(exclude=["*tests*"]),
+    packages=find_packages(exclude=["*tests*", "*binder*"]),
     install_requires=['pandas', 'scandir'],
     data_files=[("", ["LICENSE"])],
     cmdclass=versioneer.get_cmdclass(),
