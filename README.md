@@ -40,6 +40,7 @@ Update file system index:
 
     pfi.update()
 
+For more details, take a look at the example notebook: https://github.com/pyfileindex/pyfileindex/blob/master/notebooks/demo.ipynb
 
 
 # License
