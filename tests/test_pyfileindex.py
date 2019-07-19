@@ -19,7 +19,7 @@ class TestJobFileTable(unittest.TestCase):
         cls.fi_with_filter = PyFileIndex(path='.', filter_function=filter_function)
         cls.fi_without_filter = PyFileIndex(path='.')
         cls.fi_debug = PyFileIndex(path='.', filter_function=filter_function, debug=True)
-        cls.sleep_period = 10
+        cls.sleep_period = 20
 
     def test_project_single_empty_dir(self):
         p_name = 'test_project_single_empty_dir'
