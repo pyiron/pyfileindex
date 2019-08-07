@@ -3,7 +3,6 @@ PyFileIndex - pythonic file system index
 
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/61d50c2f9f5f404f879a02650ff3da35)](https://www.codacy.com/app/jan-janssen/pyfileindex?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=pyfileindex/pyfileindex&amp;utm_campaign=Badge_Grade)
 [![Build Status](https://travis-ci.org/pyfileindex/pyfileindex.svg?branch=master)](https://travis-ci.org/pyfileindex/pyfileindex)
-[![Build status](https://ci.appveyor.com/api/projects/status/n13j4aous9wohncy/branch/master?svg=true)](https://ci.appveyor.com/project/jan-janssen/pyfileindex/branch/master)
 [![Coverage Status](https://coveralls.io/repos/github/pyfileindex/pyfileindex/badge.svg?branch=master)](https://coveralls.io/github/pyfileindex/pyfileindex?branch=master)
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/pyfileindex/pyfileindex/master?filepath=notebooks%2Fdemo.ipynb)
 
