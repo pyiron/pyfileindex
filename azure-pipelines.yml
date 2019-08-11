@@ -24,16 +24,16 @@ jobs:
   - bash: echo "##vso[task.prependpath]/usr/share/miniconda/bin"
     displayName: Add conda to PATH
 
-  - bash: conda create -n pysqa -q --yes -c conda-forge python=$(python.version) coverage pandas scandir
+  - bash: conda create -n pyfileindex -q --yes -c conda-forge python=$(python.version) coverage pandas scandir
     displayName: conda install
 
   - bash: |
-      source activate pysqa
+      source activate pyfileindex
       pip install --pre .
-    displayName: pysqa install
+    displayName: pyfileindex install
 
   - bash: |
-      source activate pysqa
+      source activate pyfileindex
       coverage run --omit pyfileindex/_version.py -m unittest discover tests
     displayName: run tests
 
@@ -55,16 +55,16 @@ jobs:
   - bash: sudo chown -R $USER $CONDA
     displayName: Take ownership of conda installation
 
-  - bash: conda create -n pysqa -q --yes -c conda-forge python=$(python.version) coverage pandas scandir
+  - bash: conda create -n pyfileindex -q --yes -c conda-forge python=$(python.version) coverage pandas scandir
     displayName: conda install
 
   - bash: |
-      source activate pysqa
+      source activate pyfileindex
       pip install --pre .
-    displayName: pysqa install
+    displayName: pyfileindex install
 
   - bash: |
-      source activate pysqa
+      source activate pyfileindex
       coverage run --omit pyfileindex/_version.py -m unittest discover tests
     displayName: run tests
 
@@ -86,15 +86,15 @@ jobs:
   - bash: echo "##vso[task.prependpath]$CONDA/bin"
     displayName: Add conda to PATH
 
-  - script: conda create -n pysqa -q --yes -c conda-forge python=$(python.version) coverage pandas scandir
+  - script: conda create -n pyfileindex -q --yes -c conda-forge python=$(python.version) coverage pandas scandir
     displayName: conda install
 
   - script: |
-      call activate pysqa
+      call activate pyfileindex
       pip install --pre .
-    displayName: pysqa install
+    displayName: pyfileindex install
 
   - script: |
-      call activate pysqa
+      call activate pyfileindex
       coverage run --omit pyfileindex/_version.py -m unittest discover tests
     displayName: run tests
