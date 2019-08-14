@@ -1,0 +1,5 @@
+# .coveragerc to control coverage.py
+[run]
+source = pyfileindex
+omit = pyfileindex/_version.py
+concurrency = multiprocessing  
