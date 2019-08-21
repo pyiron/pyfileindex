@@ -1,6 +1,7 @@
 import numpy as np
 import pandas
 import os
+
 try:
     from os import scandir
 except ImportError:
@@ -16,12 +17,15 @@ class PyFileIndex(object):
         filter_function (function): function to filter for specific files
         debug (bool): enable debug print statements
     """
-    def __init__(self, path='.', filter_function=None, debug=False):
+
+    def __init__(self, path=".", filter_function=None, debug=False):
         self._debug = debug
         self._filter_function = filter_function
         path = os.path.abspath(path)
-        self._df = self._create_df_from_lst(list([self._get_lst_entry_from_path(entry=path)]) +
-                                            list(self._scandir(path=path, df=None, recursive=True)))
+        self._df = self._create_df_from_lst(
+            list([self._get_lst_entry_from_path(entry=path)])
+            + list(self._scandir(path=path, df=None, recursive=True))
+        )
 
     @property
     def df(self):
@@ -68,7 +72,9 @@ class PyFileIndex(object):
                 if entry.path not in df.path.values:
                     if entry.is_dir(follow_symlinks=False) and recursive:
                         # yield from self._scandir(path=entry.path, df=df, recursive=recursive)  # Python 3.X only
-                        for d in self._scandir(path=entry.path, df=df, recursive=recursive):
+                        for d in self._scandir(
+                            path=entry.path, df=df, recursive=recursive
+                        ):
                             yield d
                         yield self._get_lst_entry(entry=entry)
                     else:
@@ -96,8 +102,10 @@ class PyFileIndex(object):
         stat_lst = [os.stat(p) for p in df_exists.path.values]
         st_mtime = [s.st_mtime for s in stat_lst]
         st_nlink = [s.st_nlink for s in stat_lst]
-        df_modified = df_exists[~np.isclose(df_exists.mtime.values, st_mtime, rtol=1e-10, atol=1e-15) |
-                                np.not_equal(df_exists.nlink.values, st_nlink)]
+        df_modified = df_exists[
+            ~np.isclose(df_exists.mtime.values, st_mtime, rtol=1e-10, atol=1e-15)
+            | np.not_equal(df_exists.nlink.values, st_nlink)
+        ]
         if len(df_modified) > 0:
             if sum(df_modified.is_directory.values) > 0:
                 dir_changed_lst = df_modified[df_modified.is_directory].path.values
@@ -106,7 +114,9 @@ class PyFileIndex(object):
             files_changed_lst = df_modified.path.values
         else:
             files_changed_lst, dir_changed_lst = [], []
-        df_new = self._init_df_lst(path_lst=dir_changed_lst, df=df_exists, include_root=False)
+        df_new = self._init_df_lst(
+            path_lst=dir_changed_lst, df=df_exists, include_root=False
+        )
         return df_new, files_changed_lst, path_deleted_lst
 
     def update(self):
@@ -115,16 +125,25 @@ class PyFileIndex(object):
         """
         df_new, files_changed_lst, path_deleted_lst = self._get_changes_quick()
         if self._debug:
-            print('Changes: ', df_new.path.values, files_changed_lst, path_deleted_lst)
+            print("Changes: ", df_new.path.values, files_changed_lst, path_deleted_lst)
         if len(path_deleted_lst) != 0:
             self._df = self._df[~self._df.path.isin(path_deleted_lst)]
         if len(files_changed_lst) != 0:
-            df_updated = self._create_df_from_lst([self._get_lst_entry_from_path(entry=f)
-                                                   for f in files_changed_lst])
+            df_updated = self._create_df_from_lst(
+                [self._get_lst_entry_from_path(entry=f) for f in files_changed_lst]
+            )
             self._df = self._df[~self._df.path.isin(df_updated.path)]
-            self._df = pandas.concat([self._df, df_updated]).drop_duplicates().reset_index(drop=True)
+            self._df = (
+                pandas.concat([self._df, df_updated])
+                .drop_duplicates()
+                .reset_index(drop=True)
+            )
         if len(df_new) != 0:
-            self._df = pandas.concat([self._df, df_new]).drop_duplicates().reset_index(drop=True)
+            self._df = (
+                pandas.concat([self._df, df_new])
+                .drop_duplicates()
+                .reset_index(drop=True)
+            )
 
     def _get_lst_entry_from_path(self, entry):
         """
@@ -143,12 +162,14 @@ class PyFileIndex(object):
         else:
             flag = True
         if flag:
-            return [os.path.basename(entry),
-                    entry,
-                    os.path.dirname(entry),
-                    isdir,
-                    stat.st_mtime,
-                    stat.st_nlink]
+            return [
+                os.path.basename(entry),
+                entry,
+                os.path.dirname(entry),
+                isdir,
+                stat.st_mtime,
+                stat.st_nlink,
+            ]
         else:
             return []
 
@@ -169,12 +190,14 @@ class PyFileIndex(object):
         else:
             flag = True
         if flag:
-            return [entry.name,
-                    entry.path,
-                    os.path.dirname(entry.path),
-                    isdir,
-                    stat.st_mtime,
-                    stat.st_nlink]
+            return [
+                entry.name,
+                entry.path,
+                os.path.dirname(entry.path),
+                isdir,
+                stat.st_mtime,
+                stat.st_nlink,
+            ]
         else:
             return []
 
@@ -200,12 +223,25 @@ class PyFileIndex(object):
         """
         lst_clean = [l for l in lst if len(l) != 0]
         if len(lst_clean) != 0:
-            name_lst, path_lst, dirname_lst, dir_lst, mtime_lst, nlink_lst = zip(*lst_clean)
+            name_lst, path_lst, dirname_lst, dir_lst, mtime_lst, nlink_lst = zip(
+                *lst_clean
+            )
         else:
-            name_lst, path_lst, dirname_lst, dir_lst, mtime_lst, nlink_lst = [], [], [], [], [], []
-        return pandas.DataFrame({'basename': name_lst,
-                                 'path': path_lst,
-                                 'dirname': dirname_lst,
-                                 'is_directory': dir_lst,
-                                 'mtime': mtime_lst,
-                                 'nlink': nlink_lst})
+            name_lst, path_lst, dirname_lst, dir_lst, mtime_lst, nlink_lst = (
+                [],
+                [],
+                [],
+                [],
+                [],
+                [],
+            )
+        return pandas.DataFrame(
+            {
+                "basename": name_lst,
+                "path": path_lst,
+                "dirname": dirname_lst,
+                "is_directory": dir_lst,
+                "mtime": mtime_lst,
+                "nlink": nlink_lst,
+            }
+        )
