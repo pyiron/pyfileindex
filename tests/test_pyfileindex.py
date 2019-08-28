@@ -146,7 +146,7 @@ class TestJobFileTable(unittest.TestCase):
         self.assertEqual(len(fi_debug_diff), 0)
 
     def test_project_sub_dir_with_files(self):
-        if os.name != "nt":
+        if True:
             p_name = os.path.join("test_project_sub_dir_with_files", "sub")
             fi_with_filter_lst = self.fi_with_filter.dataframe.path.values
             fi_without_filter_lst = self.fi_without_filter.dataframe.path.values
