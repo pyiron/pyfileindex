@@ -24,7 +24,7 @@ jobs:
   - bash: echo "##vso[task.prependpath]/usr/share/miniconda/bin"
     displayName: Add conda to PATH
 
-  - bash: conda create -n pyfileindex -q --yes -c conda-forge python=$(python.version) coverage pandas scandir
+  - bash: conda create -n pyfileindex -q --yes -c conda-forge python=$(python.version) coverage "pandas>=0.24.2" "scandir>=1.10.0"
     displayName: conda install
 
   - bash: |
@@ -55,7 +55,7 @@ jobs:
   - bash: sudo chown -R $USER $CONDA
     displayName: Take ownership of conda installation
 
-  - bash: conda create -n pyfileindex -q --yes -c conda-forge python=$(python.version) coverage pandas scandir
+  - bash: conda create -n pyfileindex -q --yes -c conda-forge python=$(python.version) coverage "pandas>=0.24.2" "scandir>=1.10.0"
     displayName: conda install
 
   - bash: |
@@ -86,7 +86,7 @@ jobs:
   - bash: echo "##vso[task.prependpath]$CONDA/bin"
     displayName: Add conda to PATH
 
-  - script: conda create -n pyfileindex -q --yes -c conda-forge python=$(python.version) coverage pandas scandir
+  - script: conda create -n pyfileindex -q --yes -c conda-forge python=$(python.version) coverage "pandas>=0.24.2" "scandir>=1.10.0"
     displayName: conda install
 
   - script: |
