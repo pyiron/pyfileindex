@@ -1,0 +1,8 @@
+channels:
+  - conda-forge
+dependencies:
+  - coveralls
+  - coverage
+  - codacy-coverage
+  - pandas >=0.24.2
+  - scandir >=1.10.0
