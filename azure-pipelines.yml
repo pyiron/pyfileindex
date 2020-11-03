@@ -69,7 +69,7 @@ jobs:
     vmImage: $(windows)
   strategy:
     matrix:
-      Python37:
+      Python39:
         python.version: '3.9'
     maxParallel: 1
 
