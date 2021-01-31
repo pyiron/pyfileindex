@@ -29,6 +29,9 @@ setup(
 
     keywords='pyfileindex',
     packages=find_packages(exclude=["*tests*", "*binder*", "*notebooks*"]),
-    install_requires=['pandas>=0.24.2', 'scandir>=1.10.0'],
+    install_requires=[
+        'pandas==0.24.2',
+        'scandir==1.10.0'
+    ],
     cmdclass=versioneer.get_cmdclass(),
     )
