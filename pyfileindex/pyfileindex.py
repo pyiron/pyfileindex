@@ -67,6 +67,8 @@ class PyFileIndex(object):
         Returns:
             list: list of file entries
         """
+        if not os.path.exists(path):
+            return []
         if df is not None and len(df) > 0:
             for entry in scandir(path):
                 if entry.path not in df.path.values:
