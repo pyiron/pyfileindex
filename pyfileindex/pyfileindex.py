@@ -157,6 +157,8 @@ class PyFileIndex(object):
         Returns:
             list: file index entry
         """
+        if not os.path.exists(entry):
+            return []
         stat = os.stat(entry)
         isdir = os.path.isdir(entry)
         if not isdir and self._filter_function is not None:
@@ -185,6 +187,8 @@ class PyFileIndex(object):
         Returns:
             list: file index entry
         """
+        if not os.path.exists(entry):
+            return []
         stat = entry.stat()
         isdir = entry.is_dir()
         if not isdir and self._filter_function is not None:
