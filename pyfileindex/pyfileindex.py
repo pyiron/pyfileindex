@@ -209,7 +209,7 @@ class PyFileIndex(object):
                 return []
         except FileNotFoundError:
             return []
-    
+
     def _repr_html_(self):
         """
         Internal visualisation function for iPython notebooks
