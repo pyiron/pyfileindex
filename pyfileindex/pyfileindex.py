@@ -67,29 +67,30 @@ class PyFileIndex(object):
         Returns:
             list: list of file entries
         """
-        if not os.path.exists(path):
-            return []
-        if df is not None and len(df) > 0:
-            for entry in scandir(path):
-                if entry.path not in df.path.values:
+        try:
+            if df is not None and len(df) > 0:
+                for entry in scandir(path):
+                    if entry.path not in df.path.values:
+                        if entry.is_dir(follow_symlinks=False) and recursive:
+                            # yield from self._scandir(path=entry.path, df=df, recursive=recursive)  # Python 3.X only
+                            for d in self._scandir(
+                                path=entry.path, df=df, recursive=recursive
+                            ):
+                                yield d
+                            yield self._get_lst_entry(entry=entry)
+                        else:
+                            yield self._get_lst_entry(entry=entry)
+            else:
+                for entry in scandir(path):
                     if entry.is_dir(follow_symlinks=False) and recursive:
-                        # yield from self._scandir(path=entry.path, df=df, recursive=recursive)  # Python 3.X only
-                        for d in self._scandir(
-                            path=entry.path, df=df, recursive=recursive
-                        ):
+                        # yield from self._scandir(path=entry.path, recursive=recursive)  # Python 3.X only
+                        for d in self._scandir(path=entry.path, df=df, recursive=recursive):
                             yield d
                         yield self._get_lst_entry(entry=entry)
                     else:
                         yield self._get_lst_entry(entry=entry)
-        else:
-            for entry in scandir(path):
-                if entry.is_dir(follow_symlinks=False) and recursive:
-                    # yield from self._scandir(path=entry.path, recursive=recursive)  # Python 3.X only
-                    for d in self._scandir(path=entry.path, df=df, recursive=recursive):
-                        yield d
-                    yield self._get_lst_entry(entry=entry)
-                else:
-                    yield self._get_lst_entry(entry=entry)
+        except FileNotFoundError:
+            return []
 
     def _get_changes_quick(self):
         """
@@ -157,26 +158,27 @@ class PyFileIndex(object):
         Returns:
             list: file index entry
         """
-        if not os.path.exists(entry):
+        try:
+            stat = os.stat(entry)
+            isdir = os.path.isdir(entry)
+            if not isdir and self._filter_function is not None:
+                flag = self._filter_function(entry)
+            else:
+                flag = True
+            if flag:
+                return [
+                    os.path.basename(entry),
+                    entry,
+                    os.path.dirname(entry),
+                    isdir,
+                    stat.st_mtime,
+                    stat.st_nlink,
+                ]
+            else:
+                return []
+        except FileNotFoundError:
             return []
-        stat = os.stat(entry)
-        isdir = os.path.isdir(entry)
-        if not isdir and self._filter_function is not None:
-            flag = self._filter_function(entry)
-        else:
-            flag = True
-        if flag:
-            return [
-                os.path.basename(entry),
-                entry,
-                os.path.dirname(entry),
-                isdir,
-                stat.st_mtime,
-                stat.st_nlink,
-            ]
-        else:
-            return []
-
+            
     def _get_lst_entry(self, entry):
         """
         Internal function to generate file index entry from scandir DirEntry
@@ -187,26 +189,27 @@ class PyFileIndex(object):
         Returns:
             list: file index entry
         """
-        if not os.path.exists(entry):
+        try:
+            stat = entry.stat()
+            isdir = entry.is_dir()
+            if not isdir and self._filter_function is not None:
+                flag = self._filter_function(entry.path)
+            else:
+                flag = True
+            if flag:
+                return [
+                    entry.name,
+                    entry.path,
+                    os.path.dirname(entry.path),
+                    isdir,
+                    stat.st_mtime,
+                    stat.st_nlink,
+                ]
+            else:
+                return []
+        except FileNotFoundError:
             return []
-        stat = entry.stat()
-        isdir = entry.is_dir()
-        if not isdir and self._filter_function is not None:
-            flag = self._filter_function(entry.path)
-        else:
-            flag = True
-        if flag:
-            return [
-                entry.name,
-                entry.path,
-                os.path.dirname(entry.path),
-                isdir,
-                stat.st_mtime,
-                stat.st_nlink,
-            ]
-        else:
-            return []
-
+    
     def _repr_html_(self):
         """
         Internal visualisation function for iPython notebooks
