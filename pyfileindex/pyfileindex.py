@@ -178,7 +178,7 @@ class PyFileIndex(object):
                 return []
         except FileNotFoundError:
             return []
-            
+
     def _get_lst_entry(self, entry):
         """
         Internal function to generate file index entry from scandir DirEntry
