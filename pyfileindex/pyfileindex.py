@@ -83,7 +83,7 @@ class PyFileIndex(object):
                     if entry.is_dir(follow_symlinks=False) and recursive:
                         yield from self._scandir(
                             path=entry.path, recursive=recursive
-                        )  # Python 3.X only
+                        )
                         yield self._get_lst_entry(entry=entry)
                     else:
                         yield self._get_lst_entry(entry=entry)
