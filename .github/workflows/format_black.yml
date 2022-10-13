@@ -22,7 +22,7 @@ jobs:
       uses: psf/black@stable
       with:
         options: ""
-        src: "./pylammpsmpi"
+        src: "./pyfileindex"
     - name: commit
       run: |
         git config --local user.email "pyiron@mpie.de"
