@@ -3,8 +3,8 @@ PyFileIndex - pythonic file system index
 
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/61d50c2f9f5f404f879a02650ff3da35)](https://www.codacy.com/app/jan-janssen/pyfileindex?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=pyfileindex/pyfileindex&amp;utm_campaign=Badge_Grade)
 [![Python package](https://github.com/pyiron/pyfileindex/workflows/Python%20package/badge.svg)](https://github.com/pyiron/pyfileindex/actions)
-[![Coverage Status](https://coveralls.io/repos/github/pyiron/pyfileindex/badge.svg?branch=master)](https://coveralls.io/github/pyiron/pyfileindex?branch=master)
-[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/pyiron/pyfileindex/master?filepath=notebooks%2Fdemo.ipynb)
+[![Coverage Status](https://coveralls.io/repos/github/pyiron/pyfileindex/badge.svg?branch=main)](https://coveralls.io/github/pyiron/pyfileindex?branch=main)
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/pyiron/pyfileindex/main?filepath=notebooks%2Fdemo.ipynb)
 
 The pyfileindex helps to keep track of files in a specific directory, to monitor added files, modified files and deleted files. The module is compatible with Python 3.7 or later but restricted to Unix-like system - Windows is not supported. 
 
@@ -41,11 +41,11 @@ Update file system index:
 
     pfi.update()
 
-For more details, take a look at the example notebook: https://github.com/pyiron/pyfileindex/blob/master/notebooks/demo.ipynb
+For more details, take a look at the example notebook: https://github.com/pyiron/pyfileindex/blob/main/notebooks/demo.ipynb
 
 
 # License
-The pyfileindex is released under the BSD license https://github.com/pyiron/pyfileindex/blob/master/LICENSE . It is a spin-off of the pyiron project https://github.com/pyiron/pyiron therefore if you use the pyfileindex for your publication, please cite: 
+The pyfileindex is released under the BSD license https://github.com/pyiron/pyfileindex/blob/main/LICENSE . It is a spin-off of the pyiron project https://github.com/pyiron/pyiron therefore if you use the pyfileindex for your publication, please cite: 
 
     @article{pyiron-paper,
       title = {pyiron: An integrated development environment for computational materials science},
