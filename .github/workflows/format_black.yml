@@ -29,7 +29,7 @@ jobs:
         git config --local user.name "pyiron-runner"
         git commit -m "Format black" -a
     - name: push
-      uses: ad-m/github-push-action@master
+      uses: ad-m/github-push-action@main
       with:
         github_token: ${{ secrets.DEPENDABOT_WORKFLOW_TOKEN }}
         branch: ${{ github.event.pull_request.head.ref }}
