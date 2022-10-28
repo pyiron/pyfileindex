@@ -3,6 +3,6 @@ channels:
 dependencies:
   - coveralls
   - coverage
-  #- codacy-coverage
+  - codacy-coverage
   - pandas =1.5.1
   - scandir =1.10.0
