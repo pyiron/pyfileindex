@@ -98,25 +98,29 @@ class PyFileIndex(object):
         path_exists_bool_lst = [os.path.exists(p) for p in self._df.path.values]
         path_deleted_lst = self._df[~np.array(path_exists_bool_lst)].path.values
         df_exists = self._df[path_exists_bool_lst]
-        stat_lst = [os.stat(p) for p in df_exists.path.values]
-        st_mtime = [s.st_mtime for s in stat_lst]
-        st_nlink = [s.st_nlink for s in stat_lst]
-        df_modified = df_exists[
-            ~np.isclose(df_exists.mtime.values, st_mtime, rtol=1e-10, atol=1e-15)
-            | np.not_equal(df_exists.nlink.values, st_nlink)
-        ]
-        if len(df_modified) > 0:
-            if sum(df_modified.is_directory.values) > 0:
-                dir_changed_lst = df_modified[df_modified.is_directory].path.values
-            else:
-                dir_changed_lst = []
-            files_changed_lst = df_modified.path.values
+        try:
+            stat_lst = [os.stat(p) for p in df_exists.path.values]
+        except FileNotFoundError:
+            return self._get_changes_quick()
         else:
-            files_changed_lst, dir_changed_lst = [], []
-        df_new = self._init_df_lst(
-            path_lst=dir_changed_lst, df=df_exists, include_root=False
-        )
-        return df_new, files_changed_lst, path_deleted_lst
+            st_mtime = [s.st_mtime for s in stat_lst]
+            st_nlink = [s.st_nlink for s in stat_lst]
+            df_modified = df_exists[
+                ~np.isclose(df_exists.mtime.values, st_mtime, rtol=1e-10, atol=1e-15)
+                | np.not_equal(df_exists.nlink.values, st_nlink)
+            ]
+            if len(df_modified) > 0:
+                if sum(df_modified.is_directory.values) > 0:
+                    dir_changed_lst = df_modified[df_modified.is_directory].path.values
+                else:
+                    dir_changed_lst = []
+                files_changed_lst = df_modified.path.values
+            else:
+                files_changed_lst, dir_changed_lst = [], []
+            df_new = self._init_df_lst(
+                path_lst=dir_changed_lst, df=df_exists, include_root=False
+            )
+            return df_new, files_changed_lst, path_deleted_lst
 
     def update(self):
         """
