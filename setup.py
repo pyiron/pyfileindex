@@ -30,7 +30,7 @@ setup(
     keywords='pyfileindex',
     packages=find_packages(exclude=["*tests*", "*binder*", "*notebooks*"]),
     install_requires=[
-        'pandas==1.5.2',
+        'pandas==1.5.3',
         'scandir==1.10.0'
     ],
     cmdclass=versioneer.get_cmdclass(),
