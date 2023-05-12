@@ -25,7 +25,7 @@ class TestJobFileTable(unittest.TestCase):
         cls.sleep_period = 5
 
     def test_project_single_empty_dir(self):
-        p_name = "test_project_single_empty_dir"
+        p_name = os.path.join(self.path, "test_project_single_empty_dir")
         fi_with_filter_lst = self.fi_with_filter.dataframe.path.values
         fi_without_filter_lst = self.fi_without_filter.dataframe.path.values
         fi_debug_lst = self.fi_debug.dataframe.path.values
@@ -48,9 +48,9 @@ class TestJobFileTable(unittest.TestCase):
         self.assertEqual(len(fi_with_filter_diff), 1)
         self.assertEqual(len(fi_without_filter_diff), 1)
         self.assertEqual(len(fi_debug_diff), 1)
-        self.assertEqual(os.path.basename(fi_with_filter_diff[0]), p_name)
-        self.assertEqual(os.path.basename(fi_without_filter_diff[0]), p_name)
-        self.assertEqual(os.path.basename(fi_debug_diff[0]), p_name)
+        self.assertEqual(fi_with_filter_diff[0], p_name)
+        self.assertEqual(fi_without_filter_diff[0], p_name)
+        self.assertEqual(fi_debug_diff[0], p_name)
         if os.name == "nt":
             sleep(self.sleep_period)
         os.removedirs(p_name)
@@ -72,7 +72,7 @@ class TestJobFileTable(unittest.TestCase):
         self.assertEqual(len(fi_debug_diff), 0)
 
     def test_project_single_dir_with_files(self):
-        p_name = "test_project_single_dir_with_files"
+        p_name = os.path.join(self.path, "test_project_single_dir_with_files")
         fi_with_filter_lst = self.fi_with_filter.dataframe.path.values
         fi_without_filter_lst = self.fi_without_filter.dataframe.path.values
         fi_debug_lst = self.fi_debug.dataframe.path.values
@@ -99,14 +99,14 @@ class TestJobFileTable(unittest.TestCase):
         self.assertEqual(len(fi_debug_diff), 2)
         self.assertIn(
             p_name,
-            [os.path.basename(p) for p in self.fi_with_filter.dataframe.path.values],
+            [p for p in self.fi_with_filter.dataframe.path.values],
         )
         self.assertIn(
             p_name,
-            [os.path.basename(p) for p in self.fi_without_filter.dataframe.path.values],
+            [p for p in self.fi_without_filter.dataframe.path.values],
         )
         self.assertIn(
-            p_name, [os.path.basename(p) for p in self.fi_debug.dataframe.path.values]
+            p_name, [p for p in self.fi_debug.dataframe.path.values]
         )
         self.assertIn(
             "test.txt",
@@ -148,7 +148,7 @@ class TestJobFileTable(unittest.TestCase):
 
     def test_project_sub_dir_with_files(self):
         if os.name != "nt":
-            p_name = os.path.join("test_project_sub_dir_with_files", "sub")
+            p_name = os.path.join(self.path, "test_project_sub_dir_with_files", "sub")
             fi_with_filter_lst = self.fi_with_filter.dataframe.path.values
             fi_without_filter_lst = self.fi_without_filter.dataframe.path.values
             fi_debug_lst = self.fi_debug.dataframe.path.values
@@ -191,21 +191,15 @@ class TestJobFileTable(unittest.TestCase):
             )
             self.assertIn(
                 os.path.dirname(p_name),
-                [
-                    os.path.basename(p)
-                    for p in self.fi_with_filter.dataframe.path.values
-                ],
+                [p for p in self.fi_with_filter.dataframe.path.values],
             )
             self.assertIn(
                 os.path.dirname(p_name),
-                [
-                    os.path.basename(p)
-                    for p in self.fi_without_filter.dataframe.path.values
-                ],
+                [p for p in self.fi_without_filter.dataframe.path.values],
             )
             self.assertIn(
                 os.path.dirname(p_name),
-                [os.path.basename(p) for p in self.fi_debug.dataframe.path.values],
+                [p for p in self.fi_debug.dataframe.path.values],
             )
             self.assertIn(
                 "test.txt",
@@ -253,7 +247,7 @@ class TestJobFileTable(unittest.TestCase):
             self.assertEqual(len(fi_debug_diff), 0)
 
     def test_project_single_dir_with_modified_file(self):
-        p_name = "test_project_single_dir_with_modified_file"
+        p_name = os.path.join(self.path, "test_project_single_dir_with_modified_file")
         fi_with_filter_lst = self.fi_with_filter.dataframe.path.values
         fi_without_filter_lst = self.fi_without_filter.dataframe.path.values
         fi_debug_lst = self.fi_debug.dataframe.path.values
@@ -279,14 +273,14 @@ class TestJobFileTable(unittest.TestCase):
         self.assertEqual(len(fi_debug_diff), 2)
         self.assertIn(
             p_name,
-            [os.path.basename(p) for p in self.fi_with_filter.dataframe.path.values],
+            [p for p in self.fi_with_filter.dataframe.path.values],
         )
         self.assertIn(
             p_name,
-            [os.path.basename(p) for p in self.fi_without_filter.dataframe.path.values],
+            [p for p in self.fi_without_filter.dataframe.path.values],
         )
         self.assertIn(
-            p_name, [os.path.basename(p) for p in self.fi_debug.dataframe.path.values]
+            p_name, [p for p in self.fi_debug.dataframe.path.values]
         )
         self.assertIn(
             "test.txt",
