@@ -60,7 +60,7 @@ class PyFileIndex(object):
                 .drop_duplicates()
                 .reset_index(drop=True)
             )
-    
+
     def _init_df_lst(self, path_lst, df=None, include_root=True):
         """
         Internal function to build the pandas file index from a list of directories
