@@ -16,8 +16,9 @@ def touch(fname, times=None):
 class TestJobFileTable(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.fi_with_filter = PyFileIndex(path=".", filter_function=filter_function)
-        cls.fi_without_filter = PyFileIndex(path=".")
+        cls.path = os.path.dirname(os.path.abspath(__file__))
+        cls.fi_with_filter = PyFileIndex(path=cls.path, filter_function=filter_function)
+        cls.fi_without_filter = PyFileIndex(path=cls.path)
         cls.fi_debug = PyFileIndex(
             path=".", filter_function=filter_function, debug=True
         )
@@ -350,3 +351,8 @@ class TestJobFileTable(unittest.TestCase):
         self.assertEqual(len(fi_with_filter_diff), 0)
         self.assertEqual(len(fi_without_filter_diff), 0)
         self.assertEqual(len(fi_debug_diff), 0)
+
+    def test_len(self):
+        self.assertEqual(0, len(self.fi_with_filter))
+        self.assertEqual(2, len(self.fi_without_filter))
+        self.assertEqual(0, len(self.fi_debug))
