@@ -21,7 +21,7 @@ class PyFileIndex(object):
     def __init__(self, path=".", filter_function=None, debug=False):
         self._debug = debug
         self._filter_function = filter_function
-        path = os.path.abspath(path)
+        path = os.path.abspath(os.path.expanduser(path))
         self._df = self._create_df_from_lst(
             list([self._get_lst_entry_from_path(entry=path)])
             + list(self._scandir(path=path, df=None, recursive=True))
