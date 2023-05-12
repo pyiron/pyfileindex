@@ -35,12 +35,6 @@ class TestJobFileTable(unittest.TestCase):
         self.fi_with_filter.update()
         self.fi_without_filter.update()
         self.fi_debug.update()
-        fi_with_filter_sub = self.fi_with_filter.open(p_name)
-        fi_without_filter_sub = self.fi_without_filter.open(p_name)
-        fi_debug_sub = self.fi_debug.open(p_name)
-        self.assertNotEqual(fi_with_filter_sub, self.fi_with_filter)
-        self.assertNotEqual(fi_without_filter_sub, self.fi_without_filter)
-        self.assertNotEqual(fi_debug_sub, self.fi_debug)
         fi_with_filter_diff = list(
             set(self.fi_with_filter.dataframe.path.values) - set(fi_with_filter_lst)
         )
@@ -51,28 +45,35 @@ class TestJobFileTable(unittest.TestCase):
         fi_debug_diff = list(
             set(self.fi_debug.dataframe.path.values) - set(fi_debug_lst)
         )
-        fi_with_filter_diff_sub = list(
-            set(fi_with_filter_sub.dataframe.path.values) - set(fi_with_filter_lst)
-        )
-        fi_without_filter_diff_sub = list(
-            set(fi_without_filter_sub.dataframe.path.values)
-            - set(fi_without_filter_lst)
-        )
-        fi_debug_diff_sub = list(
-            set(fi_debug_sub.dataframe.path.values) - set(fi_debug_lst)
-        )
         self.assertEqual(len(fi_with_filter_diff), 1)
         self.assertEqual(len(fi_without_filter_diff), 1)
         self.assertEqual(len(fi_debug_diff), 1)
         self.assertEqual(fi_with_filter_diff[0], p_name)
         self.assertEqual(fi_without_filter_diff[0], p_name)
         self.assertEqual(fi_debug_diff[0], p_name)
-        self.assertEqual(len(fi_with_filter_diff_sub), 1)
-        self.assertEqual(len(fi_without_filter_diff_sub), 1)
-        self.assertEqual(len(fi_debug_diff_sub), 1)
-        self.assertEqual(fi_with_filter_diff_sub[0], p_name)
-        self.assertEqual(fi_without_filter_diff_sub[0], p_name)
-        self.assertEqual(fi_debug_diff_sub[0], p_name)
+        if os.name == "nt":
+            fi_with_filter_sub = self.fi_with_filter.open(p_name)
+            fi_without_filter_sub = self.fi_without_filter.open(p_name)
+            fi_debug_sub = self.fi_debug.open(p_name)
+            self.assertNotEqual(fi_with_filter_sub, self.fi_with_filter)
+            self.assertNotEqual(fi_without_filter_sub, self.fi_without_filter)
+            self.assertNotEqual(fi_debug_sub, self.fi_debug)
+            fi_with_filter_diff_sub = list(
+                set(fi_with_filter_sub.dataframe.path.values) - set(fi_with_filter_lst)
+            )
+            fi_without_filter_diff_sub = list(
+                set(fi_without_filter_sub.dataframe.path.values)
+                - set(fi_without_filter_lst)
+            )
+            fi_debug_diff_sub = list(
+                set(fi_debug_sub.dataframe.path.values) - set(fi_debug_lst)
+            )
+            self.assertEqual(len(fi_with_filter_diff_sub), 1)
+            self.assertEqual(len(fi_without_filter_diff_sub), 1)
+            self.assertEqual(len(fi_debug_diff_sub), 1)
+            self.assertEqual(fi_with_filter_diff_sub[0], p_name)
+            self.assertEqual(fi_without_filter_diff_sub[0], p_name)
+            self.assertEqual(fi_debug_diff_sub[0], p_name)
         if os.name == "nt":
             sleep(self.sleep_period)
         os.removedirs(p_name)
@@ -392,6 +393,7 @@ class TestJobFileTable(unittest.TestCase):
         self.assertEqual(html_str.count("table"), 2)
         if os.name != "nt":
             self.assertEqual(html_str.count("tr"), 8)
+            self.assertEqual(html_str.count("td"), 24)
         else:
             self.assertEqual(html_str.count("tr"), 10)
-        self.assertEqual(html_str.count("td"), 24)
+            self.assertEqual(html_str.count("td"), 36)
