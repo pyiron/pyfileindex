@@ -41,6 +41,10 @@ Update file system index:
 
     pfi.update()
 
+And open a subdirectory using: 
+
+    pfi.open(path='subdirectory')
+
 For more details, take a look at the example notebook: https://github.com/pyiron/pyfileindex/blob/main/notebooks/demo.ipynb
 
 
