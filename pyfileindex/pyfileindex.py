@@ -14,18 +14,22 @@ class PyFileIndex(object):
 
     Args:
         path (str): file system path
-        filter_function (function): function to filter for specific files
-        debug (bool): enable debug print statements
+        filter_function (function): function to filter for specific files (optional)
+        debug (bool): enable debug print statements (optional)
+        df (pandas.DataFrame): DataFrame of a previous PyFileIndex object (optional)
     """
 
-    def __init__(self, path=".", filter_function=None, debug=False):
+    def __init__(self, path=".", filter_function=None, debug=False, df=None):
         self._debug = debug
         self._filter_function = filter_function
-        path = os.path.abspath(path)
-        self._df = self._create_df_from_lst(
-            list([self._get_lst_entry_from_path(entry=path)])
-            + list(self._scandir(path=path, df=None, recursive=True))
-        )
+        self._path = os.path.abspath(os.path.expanduser(path))
+        if df is None:
+            self._df = self._create_df_from_lst(
+                list([self._get_lst_entry_from_path(entry=self._path)])
+                + list(self._scandir(path=self._path, df=None, recursive=True))
+            )
+        else:
+            self._df = df
 
     @property
     def df(self):
@@ -34,6 +38,33 @@ class PyFileIndex(object):
     @property
     def dataframe(self):
         return self.df
+
+    def open(self, path):
+        """
+        Open PyFileIndex in the subdirectory path
+
+        Args:
+             path (str): subdirectory to open
+
+        Returns:
+            PyFileIndex: PyFileIndex for subdirectory
+        """
+        abs_path = os.path.abspath(os.path.expanduser(os.path.join(self._path, path)))
+        if abs_path == self._path:
+            return self
+        elif os.path.commonpath([abs_path, self._path]) == self._path:
+            return PyFileIndex(
+                path=abs_path,
+                filter_function=self._filter_function,
+                debug=self._debug,
+                df=self._df[self._df["path"].str.contains(abs_path)]
+            )
+        else:
+            return PyFileIndex(
+                path=abs_path,
+                filter_function=self._filter_function,
+                debug=self._debug
+            )
 
     def _init_df_lst(self, path_lst, df=None, include_root=True):
         """
