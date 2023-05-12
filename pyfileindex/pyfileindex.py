@@ -57,13 +57,11 @@ class PyFileIndex(object):
                 path=abs_path,
                 filter_function=self._filter_function,
                 debug=self._debug,
-                df=self._df[self._df["path"].str.contains(abs_path)]
+                df=self._df[self._df["path"].str.contains(abs_path)],
             )
         else:
             return PyFileIndex(
-                path=abs_path,
-                filter_function=self._filter_function,
-                debug=self._debug
+                path=abs_path, filter_function=self._filter_function, debug=self._debug
             )
 
     def _init_df_lst(self, path_lst, df=None, include_root=True):
