@@ -38,6 +38,9 @@ class TestJobFileTable(unittest.TestCase):
         fi_with_filter_sub = self.fi_with_filter.open(p_name)
         fi_without_filter_sub = self.fi_without_filter.open(p_name)
         fi_debug_sub = self.fi_debug.open(p_name)
+        self.assertNotEqual(fi_with_filter_sub, self.fi_with_filter)
+        self.assertNotEqual(fi_without_filter_sub, self.fi_without_filter)
+        self.assertNotEqual(fi_debug_sub, self.fi_debug)
         fi_with_filter_diff = list(
             set(self.fi_with_filter.dataframe.path.values) - set(fi_with_filter_lst)
         )
@@ -374,3 +377,11 @@ class TestJobFileTable(unittest.TestCase):
         self.assertEqual(self.fi_with_filter.open(self.path), self.fi_with_filter)
         self.assertEqual(self.fi_without_filter.open(self.path), self.fi_without_filter)
         self.assertEqual(self.fi_debug.open(self.path), self.fi_debug)
+
+    def test_create_outside_directory(self):
+        p_name = os.path.join(self.path, "..", "test_different_dir")
+        os.makedirs(p_name)
+        self.assertNotEqual(self.fi_with_filter.open(p_name), self.fi_with_filter)
+        self.assertNotEqual(self.fi_without_filter.open(p_name), self.fi_without_filter)
+        self.assertNotEqual(self.fi_debug.open(p_name), self.fi_debug)
+        os.removedirs(p_name)
