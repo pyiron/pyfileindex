@@ -250,3 +250,7 @@ class PyFileIndex(object):
                 "nlink": nlink_lst,
             }
         )
+    
+    def __len__(self):
+        return len(self._df[~self._df.is_directory])
+
