@@ -385,3 +385,10 @@ class TestJobFileTable(unittest.TestCase):
         self.assertNotEqual(self.fi_without_filter.open(p_name), self.fi_without_filter)
         self.assertNotEqual(self.fi_debug.open(p_name), self.fi_debug)
         os.removedirs(p_name)
+
+    def test_repr_html(self):
+        html_str = self.fi_with_filter._repr_html_()
+        self.assertEqual(html_str.count("div"), 2)
+        self.assertEqual(html_str.count("table"), 2)
+        self.assertEqual(html_str.count("tr"), 8)
+        self.assertEqual(html_str.count("td"), 24)
