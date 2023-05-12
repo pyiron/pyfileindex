@@ -20,7 +20,7 @@ class TestJobFileTable(unittest.TestCase):
         cls.fi_with_filter = PyFileIndex(path=cls.path, filter_function=filter_function)
         cls.fi_without_filter = PyFileIndex(path=cls.path)
         cls.fi_debug = PyFileIndex(
-            path=".", filter_function=filter_function, debug=True
+            path=cls.path, filter_function=filter_function, debug=True
         )
         cls.sleep_period = 5
 
