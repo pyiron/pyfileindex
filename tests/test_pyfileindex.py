@@ -51,7 +51,7 @@ class TestJobFileTable(unittest.TestCase):
         self.assertEqual(fi_with_filter_diff[0], p_name)
         self.assertEqual(fi_without_filter_diff[0], p_name)
         self.assertEqual(fi_debug_diff[0], p_name)
-        if os.name == "nt":
+        if os.name != "nt":
             fi_with_filter_sub = self.fi_with_filter.open(p_name)
             fi_without_filter_sub = self.fi_without_filter.open(p_name)
             fi_debug_sub = self.fi_debug.open(p_name)
