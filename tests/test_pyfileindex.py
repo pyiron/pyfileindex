@@ -390,5 +390,8 @@ class TestJobFileTable(unittest.TestCase):
         html_str = self.fi_with_filter._repr_html_()
         self.assertEqual(html_str.count("div"), 2)
         self.assertEqual(html_str.count("table"), 2)
-        self.assertEqual(html_str.count("tr"), 8)
+        if os.name == "nt":
+            self.assertEqual(html_str.count("tr"), 8)
+        else:
+            self.assertEqual(html_str.count("tr"), 10)
         self.assertEqual(html_str.count("td"), 24)
