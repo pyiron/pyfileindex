@@ -35,6 +35,32 @@ class PyFileIndex(object):
     def dataframe(self):
         return self.df
 
+    def update(self):
+        """
+        Update file index
+        """
+        df_new, files_changed_lst, path_deleted_lst = self._get_changes_quick()
+        if self._debug:
+            print("Changes: ", df_new.path.values, files_changed_lst, path_deleted_lst)
+        if len(path_deleted_lst) != 0:
+            self._df = self._df[~self._df.path.isin(path_deleted_lst)]
+        if len(files_changed_lst) != 0:
+            df_updated = self._create_df_from_lst(
+                [self._get_lst_entry_from_path(entry=f) for f in files_changed_lst]
+            )
+            self._df = self._df[~self._df.path.isin(df_updated.path)]
+            self._df = (
+                pandas.concat([self._df, df_updated])
+                .drop_duplicates()
+                .reset_index(drop=True)
+            )
+        if len(df_new) != 0:
+            self._df = (
+                pandas.concat([self._df, df_new])
+                .drop_duplicates()
+                .reset_index(drop=True)
+            )
+
     def _init_df_lst(self, path_lst, df=None, include_root=True):
         """
         Internal function to build the pandas file index from a list of directories
@@ -117,32 +143,6 @@ class PyFileIndex(object):
             path_lst=dir_changed_lst, df=df_exists, include_root=False
         )
         return df_new, files_changed_lst, path_deleted_lst
-
-    def update(self):
-        """
-        Update file index
-        """
-        df_new, files_changed_lst, path_deleted_lst = self._get_changes_quick()
-        if self._debug:
-            print("Changes: ", df_new.path.values, files_changed_lst, path_deleted_lst)
-        if len(path_deleted_lst) != 0:
-            self._df = self._df[~self._df.path.isin(path_deleted_lst)]
-        if len(files_changed_lst) != 0:
-            df_updated = self._create_df_from_lst(
-                [self._get_lst_entry_from_path(entry=f) for f in files_changed_lst]
-            )
-            self._df = self._df[~self._df.path.isin(df_updated.path)]
-            self._df = (
-                pandas.concat([self._df, df_updated])
-                .drop_duplicates()
-                .reset_index(drop=True)
-            )
-        if len(df_new) != 0:
-            self._df = (
-                pandas.concat([self._df, df_new])
-                .drop_duplicates()
-                .reset_index(drop=True)
-            )
 
     def _get_lst_entry_from_path(self, entry):
         """
