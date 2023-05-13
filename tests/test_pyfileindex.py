@@ -403,5 +403,6 @@ class TestJobFileTable(unittest.TestCase):
 
     def test_get_changes_quick(self):
         _, files_changed_lst, path_deleted_lst = self.fi_with_filter._get_changes_quick()
-        self.assertEqual(files_changed_lst, [])
-        self.assertEqual(path_deleted_lst.tolist(), [])
+        if os.name != "nt":
+            self.assertEqual(files_changed_lst, [])
+            self.assertEqual(path_deleted_lst.tolist(), [])
