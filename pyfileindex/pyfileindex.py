@@ -151,7 +151,10 @@ class PyFileIndex(object):
             list: pandas.DataFrame with new entries, list of changed files and list of deleted paths
         """
         path_exists_bool_lst = [os.path.exists(p) for p in self._df.path.values]
-        path_deleted_lst = self._df[~np.array(path_exists_bool_lst)].path.values
+        if len(path_exists_bool_lst) != 0:
+            path_deleted_lst = self._df[~np.array(path_exists_bool_lst)].path.values
+        else:
+            path_deleted_lst = np.array([])
         df_exists = self._df[path_exists_bool_lst]
         stat_lst = [os.stat(p) for p in df_exists.path.values]
         st_mtime = [s.st_mtime for s in stat_lst]
