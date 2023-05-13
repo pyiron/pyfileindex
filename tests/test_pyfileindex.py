@@ -51,6 +51,29 @@ class TestJobFileTable(unittest.TestCase):
         self.assertEqual(fi_with_filter_diff[0], p_name)
         self.assertEqual(fi_without_filter_diff[0], p_name)
         self.assertEqual(fi_debug_diff[0], p_name)
+        if os.name != "nt":
+            fi_with_filter_sub = self.fi_with_filter.open(p_name)
+            fi_without_filter_sub = self.fi_without_filter.open(p_name)
+            fi_debug_sub = self.fi_debug.open(p_name)
+            self.assertNotEqual(fi_with_filter_sub, self.fi_with_filter)
+            self.assertNotEqual(fi_without_filter_sub, self.fi_without_filter)
+            self.assertNotEqual(fi_debug_sub, self.fi_debug)
+            fi_with_filter_diff_sub = list(
+                set(fi_with_filter_sub.dataframe.path.values) - set(fi_with_filter_lst)
+            )
+            fi_without_filter_diff_sub = list(
+                set(fi_without_filter_sub.dataframe.path.values)
+                - set(fi_without_filter_lst)
+            )
+            fi_debug_diff_sub = list(
+                set(fi_debug_sub.dataframe.path.values) - set(fi_debug_lst)
+            )
+            self.assertEqual(len(fi_with_filter_diff_sub), 1)
+            self.assertEqual(len(fi_without_filter_diff_sub), 1)
+            self.assertEqual(len(fi_debug_diff_sub), 1)
+            self.assertEqual(fi_with_filter_diff_sub[0], p_name)
+            self.assertEqual(fi_without_filter_diff_sub[0], p_name)
+            self.assertEqual(fi_debug_diff_sub[0], p_name)
         if os.name == "nt":
             sleep(self.sleep_period)
         os.removedirs(p_name)
@@ -350,3 +373,23 @@ class TestJobFileTable(unittest.TestCase):
         self.assertEqual(0, len(self.fi_with_filter))
         self.assertEqual(2, len(self.fi_without_filter))
         self.assertEqual(0, len(self.fi_debug))
+
+    def test_open(self):
+        self.assertEqual(self.fi_with_filter.open(self.path), self.fi_with_filter)
+        self.assertEqual(self.fi_without_filter.open(self.path), self.fi_without_filter)
+        self.assertEqual(self.fi_debug.open(self.path), self.fi_debug)
+
+    def test_create_outside_directory(self):
+        p_name = os.path.join(self.path, "..", "test_different_dir")
+        os.makedirs(p_name)
+        self.assertNotEqual(self.fi_with_filter.open(p_name), self.fi_with_filter)
+        self.assertNotEqual(self.fi_without_filter.open(p_name), self.fi_without_filter)
+        self.assertNotEqual(self.fi_debug.open(p_name), self.fi_debug)
+        os.removedirs(p_name)
+
+    def test_repr_html(self):
+        html_str = self.fi_with_filter._repr_html_()
+        self.assertEqual(html_str.count("div"), 2)
+        self.assertEqual(html_str.count("table"), 2)
+        self.assertEqual(html_str.count("tr"), 8)
+        self.assertEqual(html_str.count("td"), 24)
