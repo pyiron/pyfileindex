@@ -1,5 +1,6 @@
 import unittest
 import os
+import pandas
 from time import sleep
 from pyfileindex import PyFileIndex
 
@@ -393,3 +394,14 @@ class TestJobFileTable(unittest.TestCase):
         self.assertEqual(html_str.count("table"), 2)
         self.assertEqual(html_str.count("tr"), 8)
         self.assertEqual(html_str.count("td"), 24)
+
+    def test_init_df_lst(self):
+        self.assertEqual(
+            type(self.fi_with_filter._init_df_lst(path_lst=[self.fi_with_filter._path])),
+            pandas.DataFrame
+        )
+
+    def test_get_changes_quick(self):
+        _, files_changed_lst, path_deleted_lst = self.fi_with_filter._get_changes_quick()
+        self.assertEqual(files_changed_lst, [])
+        self.assertEqual(path_deleted_lst.tolist(), [])
