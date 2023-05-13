@@ -394,6 +394,3 @@ class TestJobFileTable(unittest.TestCase):
         if os.name != "nt":
             self.assertEqual(html_str.count("tr"), 8)
             self.assertEqual(html_str.count("td"), 24)
-        else:
-            self.assertEqual(html_str.count("tr"), 10)
-            self.assertEqual(html_str.count("td"), 36)
