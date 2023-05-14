@@ -253,7 +253,9 @@ class PyFileIndex(object):
     @staticmethod
     def _check_if_path_exists(path):
         if not os.path.exists(path):
-            raise FileNotFoundError("The path " + path + " does not exist on your filesystem.")
+            raise FileNotFoundError(
+                "The path " + path + " does not exist on your filesystem."
+            )
 
     @staticmethod
     def _create_df_from_lst(lst):
