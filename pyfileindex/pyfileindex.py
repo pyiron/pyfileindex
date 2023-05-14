@@ -53,6 +53,7 @@ class PyFileIndex(object):
         """
         abs_path = os.path.abspath(os.path.expanduser(os.path.join(self._path, path)))
         self._check_if_path_exists(path=abs_path)
+        self.update()
         if abs_path == self._path:
             return self
         elif os.path.commonpath([abs_path, self._path]) == self._path:
