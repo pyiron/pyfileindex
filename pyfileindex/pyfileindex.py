@@ -50,19 +50,22 @@ class PyFileIndex(object):
             PyFileIndex: PyFileIndex for subdirectory
         """
         abs_path = os.path.abspath(os.path.expanduser(os.path.join(self._path, path)))
-        if abs_path == self._path:
-            return self
-        elif os.path.commonpath([abs_path, self._path]) == self._path:
-            return PyFileIndex(
-                path=abs_path,
-                filter_function=self._filter_function,
-                debug=self._debug,
-                df=self._df[self._df["path"].str.contains(abs_path)],
-            )
+        if os.path.exists(abs_path):
+            if abs_path == self._path:
+                return self
+            elif os.path.commonpath([abs_path, self._path]) == self._path:
+                return PyFileIndex(
+                    path=abs_path,
+                    filter_function=self._filter_function,
+                    debug=self._debug,
+                    df=self._df[self._df["path"].str.contains(abs_path)],
+                )
+            else:
+                return PyFileIndex(
+                    path=abs_path, filter_function=self._filter_function, debug=self._debug
+                )
         else:
-            return PyFileIndex(
-                path=abs_path, filter_function=self._filter_function, debug=self._debug
-            )
+            raise FileNotFoundError("The path " + abs_path + " does not exist on your filesystem.")
 
     def update(self):
         """
@@ -151,10 +154,7 @@ class PyFileIndex(object):
             list: pandas.DataFrame with new entries, list of changed files and list of deleted paths
         """
         path_exists_bool_lst = [os.path.exists(p) for p in self._df.path.values]
-        if len(path_exists_bool_lst) != 0:
-            path_deleted_lst = self._df[~np.array(path_exists_bool_lst)].path.values
-        else:
-            path_deleted_lst = np.array([])
+        path_deleted_lst = self._df[~np.array(path_exists_bool_lst)].path.values
         df_exists = self._df[path_exists_bool_lst]
         stat_lst = [os.stat(p) for p in df_exists.path.values]
         st_mtime = [s.st_mtime for s in stat_lst]
