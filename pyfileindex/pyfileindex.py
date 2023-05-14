@@ -21,8 +21,7 @@ class PyFileIndex(object):
 
     def __init__(self, path=".", filter_function=None, debug=False, df=None):
         abs_path = os.path.abspath(os.path.expanduser(path))
-        if not os.path.exists(path):
-            raise FileNotFoundError("The path " + abs_path + " does not exist on your filesystem.")
+        self._check_if_path_exists(path=abs_path)
         self._debug = debug
         self._filter_function = filter_function
         self._path = abs_path
@@ -53,31 +52,28 @@ class PyFileIndex(object):
             PyFileIndex: PyFileIndex for subdirectory
         """
         abs_path = os.path.abspath(os.path.expanduser(os.path.join(self._path, path)))
-        if os.path.exists(abs_path):
-            if abs_path == self._path:
-                return self
-            elif os.path.commonpath([abs_path, self._path]) == self._path:
-                return PyFileIndex(
-                    path=abs_path,
-                    filter_function=self._filter_function,
-                    debug=self._debug,
-                    df=self._df[self._df["path"].str.contains(abs_path)],
-                )
-            else:
-                return PyFileIndex(
-                    path=abs_path,
-                    filter_function=self._filter_function,
-                    debug=self._debug,
-                )
+        self._check_if_path_exists(path=abs_path)
+        if abs_path == self._path:
+            return self
+        elif os.path.commonpath([abs_path, self._path]) == self._path:
+            return PyFileIndex(
+                path=abs_path,
+                filter_function=self._filter_function,
+                debug=self._debug,
+                df=self._df[self._df["path"].str.contains(abs_path)],
+            )
         else:
-            raise FileNotFoundError(
-                "The path " + abs_path + " does not exist on your filesystem."
+            return PyFileIndex(
+                path=abs_path,
+                filter_function=self._filter_function,
+                debug=self._debug,
             )
 
     def update(self):
         """
         Update file index
         """
+        self._check_if_path_exists(path=self._path)
         df_new, files_changed_lst, path_deleted_lst = self._get_changes_quick()
         if self._debug:
             print("Changes: ", df_new.path.values, files_changed_lst, path_deleted_lst)
@@ -253,6 +249,11 @@ class PyFileIndex(object):
             HTML object: iPython notebook representation of the pandas.DataFrame
         """
         return self._df._repr_html_()
+
+    @staticmethod
+    def _check_if_path_exists(path):
+        if not os.path.exists(path):
+            raise FileNotFoundError("The path " + path + " does not exist on your filesystem.")
 
     @staticmethod
     def _create_df_from_lst(lst):
