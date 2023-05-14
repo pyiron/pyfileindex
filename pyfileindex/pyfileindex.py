@@ -62,10 +62,14 @@ class PyFileIndex(object):
                 )
             else:
                 return PyFileIndex(
-                    path=abs_path, filter_function=self._filter_function, debug=self._debug
+                    path=abs_path,
+                    filter_function=self._filter_function,
+                    debug=self._debug,
                 )
         else:
-            raise FileNotFoundError("The path " + abs_path + " does not exist on your filesystem.")
+            raise FileNotFoundError(
+                "The path " + abs_path + " does not exist on your filesystem."
+            )
 
     def update(self):
         """
