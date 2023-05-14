@@ -50,18 +50,25 @@ class PyFileIndex(object):
             PyFileIndex: PyFileIndex for subdirectory
         """
         abs_path = os.path.abspath(os.path.expanduser(os.path.join(self._path, path)))
-        if abs_path == self._path:
-            return self
-        elif os.path.commonpath([abs_path, self._path]) == self._path:
-            return PyFileIndex(
-                path=abs_path,
-                filter_function=self._filter_function,
-                debug=self._debug,
-                df=self._df[self._df["path"].str.contains(abs_path)],
-            )
+        if os.path.exists(abs_path):
+            if abs_path == self._path:
+                return self
+            elif os.path.commonpath([abs_path, self._path]) == self._path:
+                return PyFileIndex(
+                    path=abs_path,
+                    filter_function=self._filter_function,
+                    debug=self._debug,
+                    df=self._df[self._df["path"].str.contains(abs_path)],
+                )
+            else:
+                return PyFileIndex(
+                    path=abs_path,
+                    filter_function=self._filter_function,
+                    debug=self._debug,
+                )
         else:
-            return PyFileIndex(
-                path=abs_path, filter_function=self._filter_function, debug=self._debug
+            raise FileNotFoundError(
+                "The path " + abs_path + " does not exist on your filesystem."
             )
 
     def update(self):
