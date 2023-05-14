@@ -408,3 +408,7 @@ class TestJobFileTable(unittest.TestCase):
             self.assertEqual(path_deleted_lst.tolist(), [])
         with self.assertRaises(FileNotFoundError):
             _, files_changed_lst, path_deleted_lst = self.fi_with_filter.open("no_such_folder")._get_changes_quick()
+
+    def test_folder_does_not_exist(self):
+        with self.assertRaises(FileNotFoundError):
+            PyFileIndex(path="no_such_folder")
