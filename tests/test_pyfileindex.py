@@ -171,104 +171,103 @@ class TestJobFileTable(unittest.TestCase):
         self.assertEqual(len(fi_debug_diff), 0)
 
     def test_project_sub_dir_with_files(self):
-        if os.name != "nt":
-            p_name = os.path.join(self.path, "test_project_sub_dir_with_files", "sub")
-            fi_with_filter_lst = self.fi_with_filter.dataframe.path.values
-            fi_without_filter_lst = self.fi_without_filter.dataframe.path.values
-            fi_debug_lst = self.fi_debug.dataframe.path.values
-            os.makedirs(p_name)
-            touch(os.path.join(p_name, "test.txt"))
-            touch(os.path.join(p_name, "test.o"))
-            self.fi_with_filter.update()
-            self.fi_without_filter.update()
-            self.fi_debug.update()
-            fi_with_filter_diff = list(
-                set(self.fi_with_filter.dataframe.path.values) - set(fi_with_filter_lst)
-            )
-            fi_without_filter_diff = list(
-                set(self.fi_without_filter.dataframe.path.values)
-                - set(fi_without_filter_lst)
-            )
-            fi_debug_diff = list(
-                set(self.fi_debug.dataframe.path.values) - set(fi_debug_lst)
-            )
-            self.assertEqual(len(fi_with_filter_diff), 3)
-            self.assertEqual(len(fi_without_filter_diff), 4)
-            self.assertEqual(len(fi_debug_diff), 3)
-            self.assertIn(
-                os.path.basename(p_name),
-                [
-                    os.path.basename(p)
-                    for p in self.fi_with_filter.dataframe.path.values
-                ],
-            )
-            self.assertIn(
-                os.path.basename(p_name),
-                [
-                    os.path.basename(p)
-                    for p in self.fi_without_filter.dataframe.path.values
-                ],
-            )
-            self.assertIn(
-                os.path.basename(p_name),
-                [os.path.basename(p) for p in self.fi_debug.dataframe.path.values],
-            )
-            self.assertIn(
-                os.path.dirname(p_name),
-                [p for p in self.fi_with_filter.dataframe.path.values],
-            )
-            self.assertIn(
-                os.path.dirname(p_name),
-                [p for p in self.fi_without_filter.dataframe.path.values],
-            )
-            self.assertIn(
-                os.path.dirname(p_name),
-                [p for p in self.fi_debug.dataframe.path.values],
-            )
-            self.assertIn(
-                "test.txt",
-                [
-                    os.path.basename(p)
-                    for p in self.fi_with_filter.dataframe.path.values
-                ],
-            )
-            self.assertIn(
-                "test.o",
-                [
-                    os.path.basename(p)
-                    for p in self.fi_without_filter.dataframe.path.values
-                ],
-            )
-            self.assertIn(
-                "test.txt",
-                [
-                    os.path.basename(p)
-                    for p in self.fi_without_filter.dataframe.path.values
-                ],
-            )
-            self.assertIn(
-                "test.txt",
-                [os.path.basename(p) for p in self.fi_debug.dataframe.path.values],
-            )
-            os.remove(os.path.join(p_name, "test.txt"))
-            os.remove(os.path.join(p_name, "test.o"))
-            os.removedirs(p_name)
-            self.fi_with_filter.update()
-            self.fi_without_filter.update()
-            self.fi_debug.update()
-            fi_with_filter_diff = list(
-                set(self.fi_with_filter.dataframe.path.values) - set(fi_with_filter_lst)
-            )
-            fi_without_filter_diff = list(
-                set(self.fi_without_filter.dataframe.path.values)
-                - set(fi_without_filter_lst)
-            )
-            fi_debug_diff = list(
-                set(self.fi_debug.dataframe.path.values) - set(fi_debug_lst)
-            )
-            self.assertEqual(len(fi_with_filter_diff), 0)
-            self.assertEqual(len(fi_without_filter_diff), 0)
-            self.assertEqual(len(fi_debug_diff), 0)
+        p_name = os.path.join(self.path, "test_project_sub_dir_with_files", "sub")
+        fi_with_filter_lst = self.fi_with_filter.dataframe.path.values
+        fi_without_filter_lst = self.fi_without_filter.dataframe.path.values
+        fi_debug_lst = self.fi_debug.dataframe.path.values
+        os.makedirs(p_name)
+        touch(os.path.join(p_name, "test.txt"))
+        touch(os.path.join(p_name, "test.o"))
+        self.fi_with_filter.update()
+        self.fi_without_filter.update()
+        self.fi_debug.update()
+        fi_with_filter_diff = list(
+            set(self.fi_with_filter.dataframe.path.values) - set(fi_with_filter_lst)
+        )
+        fi_without_filter_diff = list(
+            set(self.fi_without_filter.dataframe.path.values)
+            - set(fi_without_filter_lst)
+        )
+        fi_debug_diff = list(
+            set(self.fi_debug.dataframe.path.values) - set(fi_debug_lst)
+        )
+        self.assertEqual(len(fi_with_filter_diff), 3)
+        self.assertEqual(len(fi_without_filter_diff), 4)
+        self.assertEqual(len(fi_debug_diff), 3)
+        self.assertIn(
+            os.path.basename(p_name),
+            [
+                os.path.basename(p)
+                for p in self.fi_with_filter.dataframe.path.values
+            ],
+        )
+        self.assertIn(
+            os.path.basename(p_name),
+            [
+                os.path.basename(p)
+                for p in self.fi_without_filter.dataframe.path.values
+            ],
+        )
+        self.assertIn(
+            os.path.basename(p_name),
+            [os.path.basename(p) for p in self.fi_debug.dataframe.path.values],
+        )
+        self.assertIn(
+            os.path.dirname(p_name),
+            [p for p in self.fi_with_filter.dataframe.path.values],
+        )
+        self.assertIn(
+            os.path.dirname(p_name),
+            [p for p in self.fi_without_filter.dataframe.path.values],
+        )
+        self.assertIn(
+            os.path.dirname(p_name),
+            [p for p in self.fi_debug.dataframe.path.values],
+        )
+        self.assertIn(
+            "test.txt",
+            [
+                os.path.basename(p)
+                for p in self.fi_with_filter.dataframe.path.values
+            ],
+        )
+        self.assertIn(
+            "test.o",
+            [
+                os.path.basename(p)
+                for p in self.fi_without_filter.dataframe.path.values
+            ],
+        )
+        self.assertIn(
+            "test.txt",
+            [
+                os.path.basename(p)
+                for p in self.fi_without_filter.dataframe.path.values
+            ],
+        )
+        self.assertIn(
+            "test.txt",
+            [os.path.basename(p) for p in self.fi_debug.dataframe.path.values],
+        )
+        os.remove(os.path.join(p_name, "test.txt"))
+        os.remove(os.path.join(p_name, "test.o"))
+        os.removedirs(p_name)
+        self.fi_with_filter.update()
+        self.fi_without_filter.update()
+        self.fi_debug.update()
+        fi_with_filter_diff = list(
+            set(self.fi_with_filter.dataframe.path.values) - set(fi_with_filter_lst)
+        )
+        fi_without_filter_diff = list(
+            set(self.fi_without_filter.dataframe.path.values)
+            - set(fi_without_filter_lst)
+        )
+        fi_debug_diff = list(
+            set(self.fi_debug.dataframe.path.values) - set(fi_debug_lst)
+        )
+        self.assertEqual(len(fi_with_filter_diff), 0)
+        self.assertEqual(len(fi_without_filter_diff), 0)
+        self.assertEqual(len(fi_debug_diff), 0)
 
     def test_project_single_dir_with_modified_file(self):
         p_name = os.path.join(self.path, "test_project_single_dir_with_modified_file")
@@ -403,9 +402,8 @@ class TestJobFileTable(unittest.TestCase):
 
     def test_get_changes_quick(self):
         _, files_changed_lst, path_deleted_lst = self.fi_with_filter._get_changes_quick()
-        if os.name != "nt":
-            self.assertEqual(files_changed_lst, [])
-            self.assertEqual(path_deleted_lst.tolist(), [])
+        self.assertEqual(files_changed_lst, [])
+        self.assertEqual(path_deleted_lst.tolist(), [])
         with self.assertRaises(FileNotFoundError):
             _, files_changed_lst, path_deleted_lst = self.fi_with_filter.open("no_such_folder")._get_changes_quick()
 

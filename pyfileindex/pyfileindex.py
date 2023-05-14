@@ -56,12 +56,23 @@ class PyFileIndex(object):
         self.update()
         if abs_path == self._path:
             return self
-        elif os.path.commonpath([abs_path, self._path]) == self._path:
+        elif os.path.commonpath([abs_path, self._path]) == self._path and os.name != "nt":
             return PyFileIndex(
                 path=abs_path,
                 filter_function=self._filter_function,
                 debug=self._debug,
                 df=self._df[self._df["path"].str.contains(abs_path)],
+            )
+        elif os.path.commonpath([abs_path, self._path]) == self._path and os.name != "nt":
+            abs_path_unix = abs_path.replace('\\', '/')
+            return PyFileIndex(
+                path=abs_path,
+                filter_function=self._filter_function,
+                debug=self._debug,
+                df=self._df[np.array([
+                    p.replace('\\', '/').contains(abs_path_unix)
+                    for p in self._df["path"].values
+                ])],
             )
         else:
             return PyFileIndex(
