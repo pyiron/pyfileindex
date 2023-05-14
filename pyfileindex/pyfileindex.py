@@ -20,9 +20,12 @@ class PyFileIndex(object):
     """
 
     def __init__(self, path=".", filter_function=None, debug=False, df=None):
+        abs_path = os.path.abspath(os.path.expanduser(path))
+        if not os.path.exists(path):
+            raise FileNotFoundError("The path " + abs_path + " does not exist on your filesystem.")
         self._debug = debug
         self._filter_function = filter_function
-        self._path = os.path.abspath(os.path.expanduser(path))
+        self._path = abs_path
         if df is None:
             self._df = self._create_df_from_lst(
                 list([self._get_lst_entry_from_path(entry=self._path)])
