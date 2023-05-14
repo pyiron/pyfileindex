@@ -406,3 +406,7 @@ class TestJobFileTable(unittest.TestCase):
         if os.name != "nt":
             self.assertEqual(files_changed_lst, [])
             self.assertEqual(path_deleted_lst.tolist(), [])
+        _, files_changed_lst, path_deleted_lst = self.fi_with_filter.open("no_such_folder")._get_changes_quick()
+        if os.name != "nt":
+            self.assertEqual(files_changed_lst, [])
+            self.assertEqual(path_deleted_lst.tolist(), [])
