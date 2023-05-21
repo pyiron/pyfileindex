@@ -1,6 +1,7 @@
+import os
+
 import numpy as np
 import pandas
-import os
 
 try:
     from os import scandir
