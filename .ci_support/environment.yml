@@ -4,5 +4,5 @@ dependencies:
   - coveralls
   - coverage
   - codacy-coverage
-  - pandas =2.0.2
+  - pandas =2.0.3
   - scandir =1.10.0
