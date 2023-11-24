@@ -1,0 +1,5 @@
+channels:
+  - conda-forge
+dependencies:
+  - pandas =1.5.3
+  - scandir =1.10.0
