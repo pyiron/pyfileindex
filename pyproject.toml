@@ -1,0 +1,48 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pyfileindex"
+description = "pyfileindex - pythonic file system index"
+authors = [
+    { name = "Jan Janssen", email = "janssen@mpie.de" },
+]
+readme = "README.md"
+license = { file = "LICENSE" }
+keywords = ["pyiron"]
+requires-python = ">=3.8"
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Topic :: Scientific/Engineering :: Physics",
+    "License :: OSI Approved :: BSD License",
+    "Intended Audience :: Science/Research",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+]
+dependencies = [
+    "pandas==2.1.3",
+    "scandir==1.10.0",
+]
+dynamic = ["version"]
+
+[project.urls]
+Homepage = "https://github.com/pyiron/pyfileindex"
+Documentation = "https://github.com/pyiron/pyfileindex"
+Repository = "https://github.com/pyiron/pyfileindex"
+
+[tool.setuptools]
+packages = ["pyfileindex"]
+
+[tool.setuptools.dynamic]
+version = {attr = "pyfileindex.__version__"}
+
+[tool.versioneer]
+VCS = "git"
+style = "pep440-pre"
+versionfile_source = "pyfileindex/_version.py"
+parentdir_prefix = "pyfileindex"
+tag_prefix = "pyfileindex-"

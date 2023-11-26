@@ -1,8 +1,4 @@
-__version__ = "0.0.1"
-__all__ = []
-
-from ._version import get_versions
+from . import _version
 from .pyfileindex import PyFileIndex
 
-__version__ = get_versions()["version"]
-del get_versions
+__version__ = _version.get_versions()["version"]
