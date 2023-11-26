@@ -47,15 +47,15 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
-    - uses: conda-incubator/setup-miniconda@v2.2.0
+    - uses: conda-incubator/setup-miniconda@v2
       with:
         python-version: ${{ matrix.python-version }}
-        mamba-version: "*"
+        miniforge-variant: Mambaforge
         channels: conda-forge
         channel-priority: strict
-        auto-update-conda: true  
+        activate-environment: my-env
         environment-file: .ci_support/environment.yml
-        miniforge-variant: Mambaforge
+        use-mamba: true
     - name: Test
       shell: bash -l {0}
       run: |
