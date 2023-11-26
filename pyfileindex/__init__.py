@@ -1,4 +1,8 @@
 from . import _version
-from .pyfileindex import PyFileIndex
+
+try:
+    from pyfileindex.pyfileindex import PyFileIndex
+except ImportError:
+    pass
 
 __version__ = _version.get_versions()["version"]
