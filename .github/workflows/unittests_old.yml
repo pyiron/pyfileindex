@@ -21,7 +21,7 @@ jobs:
         channels: conda-forge
         channel-priority: strict
         activate-environment: my-env
-        environment-file: ci_support/environment-old.yml
+        environment-file: .ci_support/environment-old.yml
         use-mamba: true
     - name: Test
       shell: bash -l {0}
