@@ -58,4 +58,4 @@ if __name__ == "__main__":
     )
 
     with open('pyproject.toml', "w") as f:
-        f.writelines(setup_content[:2] + setup_content_new)
+        f.writelines("".join(setup_content[:2]) + setup_content_new)
