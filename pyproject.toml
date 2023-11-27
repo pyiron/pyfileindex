@@ -35,8 +35,8 @@ Homepage = "https://github.com/pyiron/pyfileindex"
 Documentation = "https://github.com/pyiron/pyfileindex"
 Repository = "https://github.com/pyiron/pyfileindex"
 
-[tool.setuptools]
-packages = ["pyfileindex"]
+[tool.setuptools.packages.find]
+include = ["pyfileindex*"]
 
 [tool.setuptools.dynamic]
 version = {attr = "pyfileindex.__version__"}
