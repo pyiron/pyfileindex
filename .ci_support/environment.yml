@@ -3,5 +3,5 @@ channels:
 dependencies:
   - coverage
   - numpy =1.26.4
-  - pandas =2.2.0
+  - pandas =2.2.1
   - scandir =1.10.0
