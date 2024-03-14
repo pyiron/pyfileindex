@@ -117,7 +117,9 @@ class PyFileIndex(object):
                 .reset_index(drop=True)
             )
 
-    def _init_df_lst(self, path_lst: list, df: pandas.DataFrame = None, include_root: bool = True) -> pandas.DataFrame:
+    def _init_df_lst(
+        self, path_lst: list, df: pandas.DataFrame = None, include_root: bool = True
+    ) -> pandas.DataFrame:
         """
         Internal function to build the pandas file index from a list of directories
 
@@ -137,7 +139,9 @@ class PyFileIndex(object):
                 total_lst.append(entry)
         return self._create_df_from_lst(total_lst)
 
-    def _scandir(self, path: str, df: pandas.DataFrame = None, recursive: bool = True) -> list:
+    def _scandir(
+        self, path: str, df: pandas.DataFrame = None, recursive: bool = True
+    ) -> list:
         """
         Internal function to recursivley scan directories
 
