@@ -35,14 +35,14 @@ class PyFileIndex(object):
             self._df = df
 
     @property
-    def df(self):
+    def df(self) -> pandas.DataFrame:
         return self._df
 
     @property
-    def dataframe(self):
+    def dataframe(self) -> pandas.DataFrame:
         return self.df
 
-    def open(self, path):
+    def open(self, path: str) -> PyFileIndex:
         """
         Open PyFileIndex in the subdirectory path
 
@@ -117,7 +117,7 @@ class PyFileIndex(object):
                 .reset_index(drop=True)
             )
 
-    def _init_df_lst(self, path_lst, df=None, include_root=True):
+    def _init_df_lst(self, path_lst: list, df: pandas.DataFrame = None, include_root: bool = True) -> pandas.DataFrame:
         """
         Internal function to build the pandas file index from a list of directories
 
@@ -137,7 +137,7 @@ class PyFileIndex(object):
                 total_lst.append(entry)
         return self._create_df_from_lst(total_lst)
 
-    def _scandir(self, path, df=None, recursive=True):
+    def _scandir(self, path: str, df: pandas.DataFrame = None, recursive: bool = True) -> list:
         """
         Internal function to recursivley scan directories
 
@@ -200,7 +200,7 @@ class PyFileIndex(object):
         )
         return df_new, files_changed_lst, path_deleted_lst
 
-    def _get_lst_entry_from_path(self, entry):
+    def _get_lst_entry_from_path(self, entry: str) -> list:
         """
         Internal function to generate file index entry from file system path
 
@@ -231,7 +231,7 @@ class PyFileIndex(object):
         except FileNotFoundError:
             return []
 
-    def _get_lst_entry(self, entry):
+    def _get_lst_entry(self, entry) -> list:
         """
         Internal function to generate file index entry from scandir DirEntry
 
@@ -262,7 +262,7 @@ class PyFileIndex(object):
         except FileNotFoundError:
             return []
 
-    def _repr_html_(self):
+    def _repr_html_(self) -> str:
         """
         Internal visualisation function for iPython notebooks
 
@@ -272,14 +272,14 @@ class PyFileIndex(object):
         return self._df._repr_html_()
 
     @staticmethod
-    def _check_if_path_exists(path):
+    def _check_if_path_exists(path: str):
         if not os.path.exists(path):
             raise FileNotFoundError(
                 "The path " + path + " does not exist on your filesystem."
             )
 
     @staticmethod
-    def _create_df_from_lst(lst):
+    def _create_df_from_lst(lst: list) -> pandas.DataFrame:
         """
         Internal function to generate file index as pandas from a list of entries
 
@@ -314,5 +314,5 @@ class PyFileIndex(object):
             }
         )
 
-    def __len__(self):
+    def __len__(self) -> int:
         return len(self._df[~self._df.is_directory])
