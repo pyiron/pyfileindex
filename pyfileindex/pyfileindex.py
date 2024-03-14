@@ -42,7 +42,7 @@ class PyFileIndex(object):
     def dataframe(self) -> pandas.DataFrame:
         return self.df
 
-    def open(self, path: str) -> PyFileIndex:
+    def open(self, path: str):
         """
         Open PyFileIndex in the subdirectory path
 
