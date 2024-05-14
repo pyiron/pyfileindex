@@ -293,7 +293,7 @@ class PyFileIndex(object):
         Returns:
             pandas.DataFrame: file index
         """
-        lst_clean = [l for l in lst if len(l) != 0]
+        lst_clean = [sub_lst for sub_lst in lst if len(sub_lst) != 0]
         if len(lst_clean) != 0:
             name_lst, path_lst, dirname_lst, dir_lst, mtime_lst, nlink_lst = zip(
                 *lst_clean

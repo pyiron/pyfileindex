@@ -129,9 +129,7 @@ class TestJobFileTable(unittest.TestCase):
             p_name,
             [p for p in self.fi_without_filter.dataframe.path.values],
         )
-        self.assertIn(
-            p_name, [p for p in self.fi_debug.dataframe.path.values]
-        )
+        self.assertIn(p_name, [p for p in self.fi_debug.dataframe.path.values])
         self.assertIn(
             "test.txt",
             [os.path.basename(p) for p in self.fi_with_filter.dataframe.path.values],
@@ -303,9 +301,7 @@ class TestJobFileTable(unittest.TestCase):
             p_name,
             [p for p in self.fi_without_filter.dataframe.path.values],
         )
-        self.assertIn(
-            p_name, [p for p in self.fi_debug.dataframe.path.values]
-        )
+        self.assertIn(p_name, [p for p in self.fi_debug.dataframe.path.values])
         self.assertIn(
             "test.txt",
             [os.path.basename(p) for p in self.fi_with_filter.dataframe.path.values],
@@ -397,16 +393,22 @@ class TestJobFileTable(unittest.TestCase):
 
     def test_init_df_lst(self):
         self.assertEqual(
-            type(self.fi_with_filter._init_df_lst(path_lst=[self.fi_with_filter._path])),
-            pandas.DataFrame
+            type(
+                self.fi_with_filter._init_df_lst(path_lst=[self.fi_with_filter._path])
+            ),
+            pandas.DataFrame,
         )
 
     def test_get_changes_quick(self):
-        _, files_changed_lst, path_deleted_lst = self.fi_with_filter._get_changes_quick()
+        _, files_changed_lst, path_deleted_lst = (
+            self.fi_with_filter._get_changes_quick()
+        )
         self.assertEqual(files_changed_lst, [])
         self.assertEqual(path_deleted_lst.tolist(), [])
         with self.assertRaises(FileNotFoundError):
-            _, files_changed_lst, path_deleted_lst = self.fi_with_filter.open("no_such_folder")._get_changes_quick()
+            _, files_changed_lst, path_deleted_lst = self.fi_with_filter.open(
+                "no_such_folder"
+            )._get_changes_quick()
 
     def test_folder_does_not_exist(self):
         with self.assertRaises(FileNotFoundError):
