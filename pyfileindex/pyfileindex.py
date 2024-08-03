@@ -1,6 +1,7 @@
 import os
 from typing import Callable, Optional
 
+import numpy as np
 import pandas
 
 try:
@@ -174,7 +175,7 @@ class PyFileIndex:
                         else:
                             yield self._get_lst_entry(entry=entry)
             else:
-                for entry in os.scandir(path):
+                for entry in scandir(path):
                     if entry.is_dir(follow_symlinks=False) and recursive:
                         yield from self._scandir(path=entry.path, recursive=recursive)
                         yield self._get_lst_entry(entry=entry)
@@ -197,10 +198,8 @@ class PyFileIndex:
         st_mtime = [s.st_mtime for s in stat_lst]
         st_nlink = [s.st_nlink for s in stat_lst]
         df_modified = df_exists[
-            ~pandas.Series(df_exists.mtime.values).isclose(
-                st_mtime, rtol=1e-10, atol=1e-15
-            )
-            | ~pandas.Series(df_exists.nlink.values).eq(st_nlink)
+            ~np.isclose(df_exists.mtime.values, st_mtime, rtol=1e-10, atol=1e-15)
+            | np.not_equal(df_exists.nlink.values, st_nlink)
         ]
         if len(df_modified) > 0:
             if sum(df_modified.is_directory.values) > 0:
