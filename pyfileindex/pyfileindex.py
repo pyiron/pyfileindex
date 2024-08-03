@@ -1,6 +1,6 @@
 import os
+from typing import Optional, Callable
 
-import numpy as np
 import pandas
 
 try:
@@ -9,18 +9,24 @@ except ImportError:
     from scandir import scandir
 
 
-class PyFileIndex(object):
+class PyFileIndex:
     """
-    The PyFileIndex maintains a pandas Dataframe to track changes in the file system.
+    The PyFileIndex maintains a pandas DataFrame to track changes in the file system.
 
     Args:
         path (str): file system path
-        filter_function (function): function to filter for specific files (optional)
+        filter_function (Callable): function to filter for specific files (optional)
         debug (bool): enable debug print statements (optional)
-        df (pandas.DataFrame): DataFrame of a previous PyFileIndex object (optional)
+        df (pd.DataFrame): DataFrame of a previous PyFileIndex object (optional)
     """
 
-    def __init__(self, path=".", filter_function=None, debug=False, df=None):
+    def __init__(
+        self,
+        path: str = ".",
+        filter_function: Optional[Callable] = None,
+        debug: bool = False,
+        df: Optional[pandas.DataFrame] = None,
+    ) -> None:
         abs_path = os.path.abspath(os.path.expanduser(path))
         self._check_if_path_exists(path=abs_path)
         self._debug = debug
@@ -42,7 +48,7 @@ class PyFileIndex(object):
     def dataframe(self) -> pandas.DataFrame:
         return self.df
 
-    def open(self, path: str):
+    def open(self, path: str) -> "PyFileIndex":
         """
         Open PyFileIndex in the subdirectory path
 
@@ -75,7 +81,7 @@ class PyFileIndex(object):
                 filter_function=self._filter_function,
                 debug=self._debug,
                 df=self._df[
-                    np.array(
+                    pandas.Series(
                         [
                             p.replace("\\", "/").contains(abs_path_unix)
                             for p in self._df["path"].values
@@ -90,7 +96,7 @@ class PyFileIndex(object):
                 debug=self._debug,
             )
 
-    def update(self):
+    def update(self) -> None:
         """
         Update file index
         """
@@ -118,7 +124,10 @@ class PyFileIndex(object):
             )
 
     def _init_df_lst(
-        self, path_lst: list, df: pandas.DataFrame = None, include_root: bool = True
+        self,
+        path_lst: list,
+        df: Optional[pandas.DataFrame] = None,
+        include_root: bool = True,
     ) -> pandas.DataFrame:
         """
         Internal function to build the pandas file index from a list of directories
@@ -140,15 +149,15 @@ class PyFileIndex(object):
         return self._create_df_from_lst(total_lst)
 
     def _scandir(
-        self, path: str, df: pandas.DataFrame = None, recursive: bool = True
+        self, path: str, df: Optional[pandas.DataFrame] = None, recursive: bool = True
     ) -> list:
         """
-        Internal function to recursivley scan directories
+        Internal function to recursively scan directories
 
         Args:
             path (str): file system path
             df (pandas.DataFrame/ None): existing file index table
-            recursive (bool): recusivley iterate over sub directories
+            recursive (bool): recursively iterate over subdirectories
 
         Returns:
             list: list of file entries
@@ -165,7 +174,7 @@ class PyFileIndex(object):
                         else:
                             yield self._get_lst_entry(entry=entry)
             else:
-                for entry in scandir(path):
+                for entry in os.scandir(path):
                     if entry.is_dir(follow_symlinks=False) and recursive:
                         yield from self._scandir(path=entry.path, recursive=recursive)
                         yield self._get_lst_entry(entry=entry)
@@ -174,22 +183,24 @@ class PyFileIndex(object):
         except FileNotFoundError:
             return []
 
-    def _get_changes_quick(self):
+    def _get_changes_quick(self) -> tuple:
         """
         Internal function to list the changes to the file system
 
         Returns:
-            list: pandas.DataFrame with new entries, list of changed files and list of deleted paths
+            tuple: pandas.DataFrame with new entries, list of changed files, and list of deleted paths
         """
         path_exists_bool_lst = [os.path.exists(p) for p in self._df.path.values]
-        path_deleted_lst = self._df[~np.array(path_exists_bool_lst)].path.values
+        path_deleted_lst = self._df[~pd.Series(path_exists_bool_lst)].path.values
         df_exists = self._df[path_exists_bool_lst]
         stat_lst = [os.stat(p) for p in df_exists.path.values]
         st_mtime = [s.st_mtime for s in stat_lst]
         st_nlink = [s.st_nlink for s in stat_lst]
         df_modified = df_exists[
-            ~np.isclose(df_exists.mtime.values, st_mtime, rtol=1e-10, atol=1e-15)
-            | np.not_equal(df_exists.nlink.values, st_nlink)
+            ~pandas.Series(df_exists.mtime.values).isclose(
+                st_mtime, rtol=1e-10, atol=1e-15
+            )
+            | ~pandas.Series(df_exists.nlink.values).eq(st_nlink)
         ]
         if len(df_modified) > 0:
             if sum(df_modified.is_directory.values) > 0:
@@ -268,15 +279,24 @@ class PyFileIndex(object):
 
     def _repr_html_(self) -> str:
         """
-        Internal visualisation function for iPython notebooks
+        Internal visualization function for iPython notebooks
 
         Returns:
-            HTML object: iPython notebook representation of the pandas.DataFrame
+            str: iPython notebook representation of the pandas.DataFrame
         """
         return self._df._repr_html_()
 
     @staticmethod
-    def _check_if_path_exists(path: str):
+    def _check_if_path_exists(path: str) -> None:
+        """
+        Internal function to check if the given path exists
+
+        Args:
+            path (str): file system path
+
+        Raises:
+            FileNotFoundError: if the path does not exist
+        """
         if not os.path.exists(path):
             raise FileNotFoundError(
                 "The path " + path + " does not exist on your filesystem."
@@ -319,4 +339,10 @@ class PyFileIndex(object):
         )
 
     def __len__(self) -> int:
+        """
+        Returns the number of files in the index.
+
+        Returns:
+            int: The number of files in the index.
+        """
         return len(self._df[~self._df.is_directory])
