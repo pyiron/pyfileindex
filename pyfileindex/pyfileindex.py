@@ -17,7 +17,7 @@ class PyFileIndex:
         path (str): file system path
         filter_function (Callable): function to filter for specific files (optional)
         debug (bool): enable debug print statements (optional)
-        df (pd.DataFrame): DataFrame of a previous PyFileIndex object (optional)
+        df (pandas.DataFrame): DataFrame of a previous PyFileIndex object (optional)
     """
 
     def __init__(
@@ -191,7 +191,7 @@ class PyFileIndex:
             tuple: pandas.DataFrame with new entries, list of changed files, and list of deleted paths
         """
         path_exists_bool_lst = [os.path.exists(p) for p in self._df.path.values]
-        path_deleted_lst = self._df[~pd.Series(path_exists_bool_lst)].path.values
+        path_deleted_lst = self._df[~pandas.Series(path_exists_bool_lst)].path.values
         df_exists = self._df[path_exists_bool_lst]
         stat_lst = [os.stat(p) for p in df_exists.path.values]
         st_mtime = [s.st_mtime for s in stat_lst]
