@@ -1,5 +1,5 @@
 import os
-from typing import Optional, Callable
+from typing import Callable, Optional
 
 import pandas
 
