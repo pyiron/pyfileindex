@@ -2,8 +2,8 @@ name: MyPy
 
 on:
   push:
-    paths:
-      - '*.py'
+    branches: [ main ]
+  pull_request:
 
 jobs:
   mypy:
