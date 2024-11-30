@@ -1,13 +1,13 @@
 import os
-from typing import Callable, Optional
+from typing import Callable, Optional, Generator
 
 import numpy as np
-import pandas
+import pandas  # type: ignore
 
 try:
-    from os import scandir
+    from os import scandir  # type: ignore
 except ImportError:
-    from scandir import scandir
+    from scandir import scandir  # type: ignore
 
 
 class PyFileIndex:
@@ -151,7 +151,7 @@ class PyFileIndex:
 
     def _scandir(
         self, path: str, df: Optional[pandas.DataFrame] = None, recursive: bool = True
-    ) -> list:
+    ) -> Generator:
         """
         Internal function to recursively scan directories
 
@@ -182,7 +182,7 @@ class PyFileIndex:
                     else:
                         yield self._get_lst_entry(entry=entry)
         except FileNotFoundError:
-            return []
+            yield from ()
 
     def _get_changes_quick(self) -> tuple:
         """
@@ -319,12 +319,12 @@ class PyFileIndex:
             )
         else:
             name_lst, path_lst, dirname_lst, dir_lst, mtime_lst, nlink_lst = (
-                [],
-                [],
-                [],
-                [],
-                [],
-                [],
+                (),
+                (),
+                (),
+                (),
+                (),
+                (),
             )
         return pandas.DataFrame(
             {
