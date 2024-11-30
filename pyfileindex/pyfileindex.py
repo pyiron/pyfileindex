@@ -2,10 +2,10 @@ import os
 from typing import Callable, Generator, Optional
 
 import numpy as np
-import pandas  # type: ignore
+import pandas
 
 try:
-    from os import scandir  # type: ignore
+    from os import scandir
 except ImportError:
     from scandir import scandir  # type: ignore
 
