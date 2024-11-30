@@ -1,5 +1,5 @@
 import os
-from typing import Callable, Optional, Generator
+from typing import Callable, Generator, Optional
 
 import numpy as np
 import pandas  # type: ignore
