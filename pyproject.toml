@@ -36,6 +36,35 @@ Homepage = "https://github.com/pyiron/pyfileindex"
 Documentation = "https://github.com/pyiron/pyfileindex"
 Repository = "https://github.com/pyiron/pyfileindex"
 
+[tool.ruff]
+exclude = [".ci_support", "notebooks", "tests", "setup.py", "_version.py"]
+
+[tool.ruff.lint]
+select = [
+    # pycodestyle
+    "E",
+    # Pyflakes
+    "F",
+    # pyupgrade
+    "UP",
+    # flake8-bugbear
+    "B",
+    # flake8-simplify
+    "SIM",
+    # isort
+    "I",
+    # flake8-comprehensions
+    "C4",
+    # eradicate
+    "ERA",
+    # pylint
+    "PL",
+]
+ignore = [
+    # ignore line-length violations
+    "E501",
+]
+
 [tool.setuptools.packages.find]
 include = ["pyfileindex*"]
 

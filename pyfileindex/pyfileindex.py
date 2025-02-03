@@ -1,5 +1,6 @@
 import os
-from typing import Callable, Generator, Optional
+from collections.abc import Generator
+from typing import Callable, Optional
 
 import numpy as np
 import pandas
@@ -35,7 +36,7 @@ class PyFileIndex:
         self._path = abs_path
         if df is None:
             self._df = self._create_df_from_lst(
-                list([self._get_lst_entry_from_path(entry=self._path)])
+                [self._get_lst_entry_from_path(entry=self._path)]
                 + list(self._scandir(path=self._path, df=None, recursive=True))
             )
         else:
