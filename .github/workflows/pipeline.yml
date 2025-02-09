@@ -15,6 +15,29 @@ jobs:
         options: "--check --diff"
         src: ./${{ github.event.repository.name }}
 
+  black_fix:
+    if: failure()
+    permissions:
+      contents: write
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: format black
+      uses: psf/black@stable
+      with:
+        options: ""
+        src: "./${{ github.event.repository.name }}"
+    - name: commit
+      run: |
+        git config --local user.email "pyiron@mpie.de"
+        git config --local user.name "pyiron-runner"
+        git commit -m "Format black" -a
+    - name: push
+      uses: ad-m/github-push-action@master
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        branch: ${{ github.ref }}
+
   mypy:
     needs: [black]
     runs-on: ubuntu-latest
@@ -129,7 +152,7 @@ jobs:
       contents: write
       pull-requests: write
     runs-on: ubuntu-latest
-    if: (github.event.pull_request.user.login == 'dependabot[bot]' || github.event.pull_request.user.login == 'pre-commit-ci[bot]') && github.event.pull_request.conclusion == 'success' && github.repository == 'pyiron/pyfileindex'
+    if: (github.event.pull_request.user.login == 'dependabot[bot]' || github.event.pull_request.user.login == 'pre-commit-ci[bot]')
     steps:
       - name: Enable auto-merge for bot PRs
         run: gh pr merge --auto --squash "$PR_URL"
