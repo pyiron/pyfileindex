@@ -122,3 +122,17 @@ jobs:
         pip install versioneer[toml]==0.29
         pip install . --no-deps --no-build-isolation
         python -m unittest discover tests
+
+  autobot:
+    needs: [unittest_old, unittest_matrix, pip_check, mypy]
+    permissions:
+      contents: write
+      pull-requests: write
+    runs-on: ubuntu-latest
+    if: (github.event.pull_request.user.login == 'dependabot[bot]' || github.event.pull_request.user.login == 'pre-commit-ci[bot]') && github.event.pull_request.conclusion == 'success' && github.repository == 'pyiron/pyfileindex'
+    steps:
+      - name: Enable auto-merge for bot PRs
+        run: gh pr merge --auto --squash "$PR_URL"
+        env:
+          PR_URL: ${{github.event.pull_request.html_url}}
+          GH_TOKEN: ${{secrets.GITHUB_TOKEN}}
