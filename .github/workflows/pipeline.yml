@@ -16,6 +16,7 @@ jobs:
         src: ./${{ github.event.repository.name }}
 
   black_fix:
+    needs: [black]
     if: failure()
     permissions:
       contents: write
