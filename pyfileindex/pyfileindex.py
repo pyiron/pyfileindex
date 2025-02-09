@@ -35,10 +35,7 @@ class PyFileIndex:
         self._filter_function = filter_function
         self._path = abs_path
         if df is None:
-            self._df = self._create_df_from_lst(
-                [self._get_lst_entry_from_path(entry=self._path)]
-                + list(self._scandir(path=self._path, df=None, recursive=True))
-            )
+            self._df = self._create_df_from_lst([self._get_lst_entry_from_path(entry=self._path)] + list(self._scandir(path=self._path, df=None, recursive=True)))
         else:
             self._df = df
 
