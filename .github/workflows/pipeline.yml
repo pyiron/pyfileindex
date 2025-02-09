@@ -18,11 +18,13 @@ jobs:
   black_fix:
     needs: [black]
     if: failure()
-    permissions:
-      contents: write
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
+      with:
+        token: ${{ secrets.DEPENDABOT_WORKFLOW_TOKEN }}
+        ref: ${{ github.event.pull_request.head.ref }} # Check out the head of the actual branch, not the PR
+        fetch-depth: 0 # otherwise, you will fail to push refs to dest repo
     - name: format black
       uses: psf/black@stable
       with:
@@ -36,8 +38,8 @@ jobs:
     - name: push
       uses: ad-m/github-push-action@master
       with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        branch: ${{ github.ref }}
+        github_token: ${{ secrets.DEPENDABOT_WORKFLOW_TOKEN }}
+        branch: ${{ github.event.pull_request.head.ref }}
 
   mypy:
     needs: [black]
