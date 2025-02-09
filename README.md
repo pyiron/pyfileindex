@@ -1,7 +1,7 @@
 # pyfileindex
 PyFileIndex - pythonic file system index 
 
-[![Python package](https://github.com/pyiron/pyfileindex/workflows/Python%20package/badge.svg)](https://github.com/pyiron/pyfileindex/actions)
+[![Pipeline](https://github.com/pyiron/pyfileindex/actions/workflows/pipeline.yml/badge.svg)](https://github.com/pyiron/pyfileindex/actions/workflows/pipeline.yml)
 [![Coverage Status](https://coveralls.io/repos/github/pyiron/pyfileindex/badge.svg?branch=main)](https://coveralls.io/github/pyiron/pyfileindex?branch=main)
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/pyiron/pyfileindex/main?filepath=notebooks%2Fdemo.ipynb)
 
