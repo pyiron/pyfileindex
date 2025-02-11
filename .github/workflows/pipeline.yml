@@ -129,15 +129,6 @@ jobs:
       if: matrix.label == 'linux-64-py-3-12'
       uses: coverallsapp/github-action@v2
       with:
-        parallel: true
-        flag-name: "run-0"
-        build-number: ${{ github.run_id }}
-    - name: Coveralls Finish
-      if: matrix.label == 'linux-64-py-3-12'
-      uses: coverallsapp/github-action@v2
-      with:
-        parallel-finished: true
-        carryforward: "run-0"
         build-number: ${{ github.run_id }}
 
   unittest_old:
