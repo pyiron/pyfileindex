@@ -129,7 +129,7 @@ jobs:
       if: matrix.label == 'linux-64-py-3-12'
       uses: coverallsapp/github-action@v2
       with:
-        build-number: ${{ github.run_id }}
+        build-number: ${{ github.run_id.split('.')[0] }}
 
   unittest_old:
     needs: [black]
