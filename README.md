@@ -2,7 +2,7 @@
 PyFileIndex - pythonic file system index 
 
 [![Pipeline](https://github.com/pyiron/pyfileindex/actions/workflows/pipeline.yml/badge.svg)](https://github.com/pyiron/pyfileindex/actions/workflows/pipeline.yml)
-[![Coverage Status](https://coveralls.io/repos/github/pyiron/pyfileindex/badge.svg?branch=main)](https://coveralls.io/github/pyiron/pyfileindex?branch=main)
+[![codecov](https://codecov.io/gh/pyiron/pyfileindex/graph/badge.svg?token=J9EWZBBKPH)](https://codecov.io/gh/pyiron/pyfileindex)
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/pyiron/pyfileindex/main?filepath=notebooks%2Fdemo.ipynb)
 
 The pyfileindex helps to keep track of files in a specific directory, to monitor added files, modified files and deleted files. The module is compatible with Python 3.7 or later but restricted to Unix-like system - Windows is not supported. 
