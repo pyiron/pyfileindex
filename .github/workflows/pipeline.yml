@@ -125,11 +125,18 @@ jobs:
         pip install . --no-deps --no-build-isolation
         coverage run --omit="pyfileindex/_version.py,tests/*" -m unittest discover tests
         coverage xml
+    - name: Split build number
+      uses: xom9ikk/split@v1
+      id: split
+      with:
+        string: ${{ github.run_id }}
+        separator: .
+        limit: -1
     - name: Coveralls
       if: matrix.label == 'linux-64-py-3-12'
       uses: coverallsapp/github-action@v2
       with:
-        build-number: ${{ github.run_id.split('.')[0] }}
+        build-number: ${{ steps.split.outputs._0 }}
 
   unittest_old:
     needs: [black]
