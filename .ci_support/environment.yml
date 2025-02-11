@@ -1,7 +1,7 @@
 channels:
   - conda-forge
 dependencies:
-  - coverage
+  - coverage =7.6.10
   - numpy =2.2.2
   - pandas =2.2.3
   - scandir =1.10.0
