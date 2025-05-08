@@ -3,3 +3,5 @@ channels:
 dependencies:
 - python
 - pandas
+- setuptools
+- scandir
