@@ -1,1 +1,1 @@
-pip install --pre .
+pip install . --no-deps --no-build-isolation
