@@ -3,7 +3,7 @@ requires = [
     "numpy==2.2.4",
     "pandas==2.2.3",
     "scandir==1.10.0",
-    "setuptools==80.1.0",
+    "setuptools==80.3.1",
     "versioneer[toml]==0.29",
 ]
 build-backend = "setuptools.build_meta"
