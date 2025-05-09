@@ -6,10 +6,6 @@ if __name__ == "__main__":
         data = tomlkit.load(f)
 
     lst = list(data['build-system']['requires'])
-    for sub_lst in data["project"]["optional-dependencies"].values():
-        for el in sub_lst:
-            lst.append(el)
-
     data["project"]["dependencies"] += [el for el in set(lst) if not el.startswith("pyauthenticator")]
 
     with open("pyproject.toml", "w") as f:
