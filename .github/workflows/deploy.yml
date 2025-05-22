@@ -33,6 +33,6 @@ jobs:
         python .ci_support/release.py; cat pyproject.toml
     - name: Build
       shell: bash -l {0}
-      run: hatch build -t sdist -t wheel
+      run: hatchling build -t sdist -t wheel
     - name: Publish distribution 📦 to PyPI
       uses: pypa/gh-action-pypi-publish@release/v1
