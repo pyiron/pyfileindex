@@ -2,7 +2,8 @@ channels:
   - conda-forge
 dependencies:
   - coverage
+  - hatchling =1.27.0
+  - hatch-vcs =0.4.0
   - numpy =2.2.4
   - pandas =2.2.3
   - scandir =1.10.0
-  - setuptools =80.8.0
