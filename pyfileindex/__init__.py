@@ -1,4 +1,5 @@
 from pyfileindex.pyfileindex import PyFileIndex
+
 from . import _version
 
 __all__ = ["PyFileIndex"]
