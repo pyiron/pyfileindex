@@ -7,7 +7,7 @@ PyFileIndex - pythonic file system index
 
 The pyfileindex helps to keep track of files in a specific directory, to monitor added files, modified files and deleted files. The module is compatible with Python 3.7 or later but restricted to Unix-like system - Windows is not supported. 
 
-![Preview](pyfileindex.gif)
+![Preview](https://raw.githubusercontent.com/pyiron/pyfileindex/main/pyfileindex.gif)
 
 # Installation
 The pyfileindex can either be installed via pip using:
