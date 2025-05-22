@@ -7,7 +7,4 @@ inspectionProfiles/
 _build/
 apidoc/
 .ipynb_checkpoints/
-pyfileindex/_version.py
-pyproject.toml
-environment.yml
 dist/
