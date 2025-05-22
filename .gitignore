@@ -10,3 +10,4 @@ apidoc/
 pyfileindex/_version.py
 pyproject.toml
 environment.yml
+dist/
