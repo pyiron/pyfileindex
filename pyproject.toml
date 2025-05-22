@@ -76,6 +76,9 @@ include = [
     "pyfileindex"
 ]
 
+[tool.hatch.build.hooks.vcs]
+version-file = "pyfileindex/_version.py"
+
 [tool.hatch.build.targets.sdist]
 include = [
     "pyfileindex"
@@ -90,5 +93,5 @@ packages = [
 source = "vcs"
 path = "pyfileindex/_version.py"
 
-[tool.hatch.build.hooks.vcs]
-version-file = "pyfileindex/_version.py"
+[tool.hatch.version.raw-options]
+version_scheme = "no-guess-dev"
