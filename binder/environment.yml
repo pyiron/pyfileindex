@@ -2,8 +2,8 @@ channels:
 - conda-forge
 dependencies:
 - python
+- hatchling
+- hatch-vcs
 - numpy
 - pandas
-- setuptools
 - scandir
-- versioneer
