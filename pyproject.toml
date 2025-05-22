@@ -92,6 +92,3 @@ packages = [
 [tool.hatch.version]
 source = "vcs"
 path = "pyfileindex/_version.py"
-
-[tool.hatch.version.raw-options]
-version_scheme = "no-guess-dev"
