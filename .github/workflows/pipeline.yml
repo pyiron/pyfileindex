@@ -105,10 +105,6 @@ jobs:
           python-version: '3.13'
           label: linux-64-py-3-13
 
-        - operating-system: windows-latest
-          python-version: '3.13'
-          label: win-64-py-3-13
-
         - operating-system: ubuntu-latest
           python-version: '3.12'
           label: linux-64-py-3-12
