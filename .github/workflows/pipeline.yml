@@ -97,9 +97,9 @@ jobs:
           python-version: '3.13'
           label: linux-arm-22-py-3-13
 
-        - operating-system: windows-11-arm
+        - operating-system: windows-latest
           python-version: '3.13'
-          label: win-arm-py-3-13
+          label: win-64-py-3-13
 
         - operating-system: ubuntu-latest
           python-version: '3.13'
