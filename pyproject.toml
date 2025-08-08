@@ -1,12 +1,12 @@
 [build-system]
 requires = [
+    "hatchling==1.27.0",
+    "hatch-vcs==0.5.0",
     "numpy==2.2.4",
-    "pandas==2.2.3",
+    "pandas==2.3.1",
     "scandir==1.10.0",
-    "setuptools==80.1.0",
-    "versioneer[toml]==0.29",
 ]
-build-backend = "setuptools.build_meta"
+build-backend = "hatchling.build"
 
 [project]
 name = "pyfileindex"
@@ -32,7 +32,7 @@ classifiers = [
 ]
 dependencies = [
     "numpy==2.2.4",
-    "pandas==2.2.3",
+    "pandas==2.3.1",
     "scandir==1.10.0",
 ]
 dynamic = ["version"]
@@ -71,19 +71,28 @@ ignore = [
     "E501",
 ]
 
-[tool.setuptools.packages.find]
-include = ["pyfileindex*"]
+[tool.hatch.build]
+include = [
+    "pyfileindex"
+]
 
-[tool.setuptools.dynamic]
-version = {attr = "pyfileindex.__version__"}
+[tool.hatch.build.hooks.vcs]
+version-file = "pyfileindex/_version.py"
 
-[tool.versioneer]
-VCS = "git"
-style = "pep440-pre"
-versionfile_source = "pyfileindex/_version.py"
-parentdir_prefix = "pyfileindex"
-tag_prefix = "pyfileindex-"
+[tool.hatch.build.targets.sdist]
+include = [
+    "pyfileindex"
+]
+
+[tool.hatch.build.targets.wheel]
+packages = [
+    "pyfileindex"
+]
+
+[tool.hatch.version]
+source = "vcs"
+path = "pyfileindex/_version.py"
 
 [tool.coverage.run]
-omit = ["pyfileindex/_version.py","tests/*"]
+omit = ["pyfileindex/_version.py", "tests/*"]
 command_line = "-m unittest discover tests"
