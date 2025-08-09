@@ -1,7 +1,12 @@
 import unittest
 import os
-import pandas
+import importlib
+import sys
 from time import sleep
+
+import pandas
+from unittest.mock import patch, MagicMock
+
 from pyfileindex import PyFileIndex
 
 
@@ -413,3 +418,58 @@ class TestJobFileTable(unittest.TestCase):
     def test_folder_does_not_exist(self):
         with self.assertRaises(FileNotFoundError):
             PyFileIndex(path="no_such_folder")
+
+
+class TestJobFileTableCoverage(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.path = os.path.dirname(os.path.abspath(__file__))
+        cls.fi = PyFileIndex(path=cls.path)
+
+    def test_scandir_import_error(self):
+        with patch.dict(sys.modules, {'os.scandir': None}):
+            import pyfileindex.pyfileindex
+            importlib.reload(pyfileindex.pyfileindex)
+            fi = pyfileindex.pyfileindex.PyFileIndex(path=self.path)
+            self.assertIsInstance(fi, pyfileindex.pyfileindex.PyFileIndex)
+        import pyfileindex.pyfileindex
+        importlib.reload(pyfileindex.pyfileindex)
+
+    def test_open_windows(self):
+        with patch('os.name', 'nt'):
+            p_name = os.path.join(self.path, "test_open_windows")
+            os.makedirs(p_name, exist_ok=True)
+            # To cover the second nt path, we need to create a new PyFileIndex inside the patch
+            fi = PyFileIndex(path=self.path)
+            fi_new = fi.open(p_name)
+            self.assertNotEqual(fi_new, fi)
+            self.assertEqual(len(fi_new.df), 1)
+            self.assertEqual(fi_new.df.iloc[0].path, os.path.abspath(p_name))
+            os.removedirs(p_name)
+
+    def test_get_lst_entry_from_path_with_filter(self):
+        def my_filter(file_name):
+            return ".pdb" in file_name
+        
+        p_name = os.path.join(self.path, "filtered_file.txt")
+        touch(p_name)
+        fi = PyFileIndex(path=self.path, filter_function=my_filter)
+        self.assertEqual(len(fi.df[fi.df.basename == "filtered_file.txt"]), 0)
+        os.remove(p_name)
+
+    def test_scandir_file_not_found(self):
+        result = list(self.fi._scandir(path="non_existent_path"))
+        self.assertEqual(result, [])
+
+    def test_get_lst_entry_from_path_file_not_found(self):
+        result = self.fi._get_lst_entry_from_path(entry="non_existent_path")
+        self.assertEqual(result, [])
+
+    def test_get_lst_entry_file_not_found(self):
+        mock_entry = MagicMock()
+        mock_entry.name = "test_file"
+        mock_entry.path = "/path/to/test_file"
+        mock_entry.is_dir.return_value = False
+        mock_entry.stat.side_effect = FileNotFoundError
+        result = self.fi._get_lst_entry(entry=mock_entry)
+        self.assertEqual(result, [])
