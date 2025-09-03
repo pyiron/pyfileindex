@@ -102,6 +102,10 @@ jobs:
           label: win-64-py-3-13
 
         - operating-system: ubuntu-latest
+          python-version: '3.14'
+          label: linux-64-py-3-14
+
+        - operating-system: ubuntu-latest
           python-version: '3.13'
           label: linux-64-py-3-13
 
