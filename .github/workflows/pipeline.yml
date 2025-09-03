@@ -122,7 +122,7 @@ jobs:
     - name: Conda config
       shell: bash -l {0}
       run: echo -e "channels:\n  - conda-forge\n" > .condarc
-    - uses: conda-incubator/setup-miniconda@v3.2
+    - uses: conda-incubator/setup-miniconda@v3.2.0
       with:
         python-version: ${{ matrix.python-version }}
         miniforge-version: latest
