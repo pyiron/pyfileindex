@@ -102,7 +102,7 @@ jobs:
           label: win-64-py-3-13
 
         - operating-system: ubuntu-latest
-          python-version: '3.14.0rc2'
+          python-version: '3.14'
           label: linux-64-py-3-14
 
         - operating-system: ubuntu-latest
@@ -122,7 +122,7 @@ jobs:
     - name: Conda config
       shell: bash -l {0}
       run: echo -e "channels:\n  - conda-forge\n" > .condarc
-    - uses: conda-incubator/setup-miniconda@v3.2.0
+    - uses: conda-incubator/setup-miniconda@v3
       with:
         python-version: ${{ matrix.python-version }}
         miniforge-version: latest
