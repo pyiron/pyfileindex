@@ -72,8 +72,23 @@ ignore = [
     "E501",
 ]
 
+[tool.hatch.build]
+include = [
+    "src/pyfileindex"
+]
+
 [tool.hatch.build.hooks.vcs]
 version-file = "src/pyfileindex/_version.py"
+
+[tool.hatch.build.targets.sdist]
+include = [
+    "src/pyfileindex"
+]
+
+[tool.hatch.build.targets.wheel]
+packages = [
+    "src/pyfileindex"
+]
 
 [tool.hatch.version]
 source = "vcs"
