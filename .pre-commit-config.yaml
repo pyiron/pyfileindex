@@ -5,6 +5,6 @@ repos:
       - id: ruff
         name: ruff lint
         args: ["--fix"]
-        files: ^pyfileindex/
+        files: ^src/pyfileindex/
       - id: ruff-format
         name: ruff format
