@@ -175,7 +175,9 @@ class PyFileIndex:
                 with os.scandir(path) as it:
                     for entry in it:
                         if entry.is_dir(follow_symlinks=False) and recursive:
-                            yield from self._scandir(path=entry.path, recursive=recursive)
+                            yield from self._scandir(
+                                path=entry.path, recursive=recursive
+                            )
                             yield self._get_lst_entry(entry=entry)
                         else:
                             yield self._get_lst_entry(entry=entry)
