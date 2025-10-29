@@ -6,4 +6,3 @@ dependencies:
   - hatch-vcs =0.5.0
   - numpy =2.3.4
   - pandas =2.3.3
-  - scandir =1.10.0

@@ -5,11 +5,6 @@ from typing import Callable, Optional
 import numpy as np
 import pandas
 
-try:
-    from os import scandir
-except ImportError:
-    from scandir import scandir  # type: ignore
-
 
 class PyFileIndex:
     """
@@ -166,22 +161,26 @@ class PyFileIndex:
         """
         try:
             if df is not None and len(df) > 0:
-                for entry in scandir(path):
-                    if entry.path not in df.path.values:
+                with os.scandir(path) as it:
+                    for entry in it:
+                        if entry.path not in df.path.values:
+                            if entry.is_dir(follow_symlinks=False) and recursive:
+                                yield from self._scandir(
+                                    path=entry.path, df=df, recursive=recursive
+                                )
+                                yield self._get_lst_entry(entry=entry)
+                            else:
+                                yield self._get_lst_entry(entry=entry)
+            else:
+                with os.scandir(path) as it:
+                    for entry in it:
                         if entry.is_dir(follow_symlinks=False) and recursive:
                             yield from self._scandir(
-                                path=entry.path, df=df, recursive=recursive
+                                path=entry.path, recursive=recursive
                             )
                             yield self._get_lst_entry(entry=entry)
                         else:
                             yield self._get_lst_entry(entry=entry)
-            else:
-                for entry in scandir(path):
-                    if entry.is_dir(follow_symlinks=False) and recursive:
-                        yield from self._scandir(path=entry.path, recursive=recursive)
-                        yield self._get_lst_entry(entry=entry)
-                    else:
-                        yield self._get_lst_entry(entry=entry)
         except FileNotFoundError:
             yield from ()
 
