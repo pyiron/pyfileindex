@@ -6,4 +6,3 @@ dependencies:
 - hatch-vcs
 - numpy
 - pandas
-- scandir
