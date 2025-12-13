@@ -409,7 +409,7 @@ class TestJobFileTable(unittest.TestCase):
             self.fi_with_filter._get_changes_quick()
         )
         self.assertEqual(files_changed_lst, [])
-        self.assertEqual(path_deleted_lst.tolist(), [])
+        self.assertEqual(path_deleted_lst, [])
         with self.assertRaises(FileNotFoundError):
             _, files_changed_lst, path_deleted_lst = self.fi_with_filter.open(
                 "no_such_folder"

@@ -2,7 +2,6 @@ import os
 from collections.abc import Generator
 from typing import Callable, Optional
 
-import numpy as np
 import pandas
 
 
@@ -60,31 +59,12 @@ class PyFileIndex:
         self.update()
         if abs_path == self._path:
             return self
-        elif (
-            os.path.commonpath([abs_path, self._path]) == self._path and os.name != "nt"
-        ):
+        elif os.path.commonpath([abs_path, self._path]) == self._path:
             return PyFileIndex(
                 path=abs_path,
                 filter_function=self._filter_function,
                 debug=self._debug,
-                df=self._df[self._df["path"].str.contains(abs_path)],
-            )
-        elif (
-            os.path.commonpath([abs_path, self._path]) == self._path and os.name != "nt"
-        ):
-            abs_path_unix = abs_path.replace("\\", "/")
-            return PyFileIndex(
-                path=abs_path,
-                filter_function=self._filter_function,
-                debug=self._debug,
-                df=self._df[
-                    np.array(
-                        [
-                            p.replace("\\", "/").contains(abs_path_unix)
-                            for p in self._df["path"].values
-                        ]
-                    )
-                ],
+                df=self._df[self._df.path.str.startswith(abs_path)],
             )
         else:
             return PyFileIndex(
@@ -191,22 +171,22 @@ class PyFileIndex:
         Returns:
             tuple: pandas.DataFrame with new entries, list of changed files, and list of deleted paths
         """
-        path_exists_bool_lst = [os.path.exists(p) for p in self._df.path.values]
-        path_deleted_lst = self._df[~np.array(path_exists_bool_lst)].path.values
-        df_exists = self._df[path_exists_bool_lst]
-        stat_lst = [os.stat(p) for p in df_exists.path.values]
-        st_mtime = [s.st_mtime for s in stat_lst]
-        st_nlink = [s.st_nlink for s in stat_lst]
+        path_exists = self._df.path.apply(os.path.exists)
+        path_deleted_lst = self._df[~path_exists].path.to_list()
+        df_exists = self._df[path_exists]
+        stat_lst = [os.stat(p) for p in df_exists.path]
+        st_mtime = pandas.Series([s.st_mtime for s in stat_lst], index=df_exists.index)
+        st_nlink = pandas.Series([s.st_nlink for s in stat_lst], index=df_exists.index)
         df_modified = df_exists[
-            ~np.isclose(df_exists.mtime.values, st_mtime, rtol=1e-10, atol=1e-15)
-            | np.not_equal(df_exists.nlink.values, st_nlink)
+            ((df_exists.mtime - st_mtime).abs() > (1e-15 + 1e-10 * st_mtime.abs()))
+            | (df_exists.nlink != st_nlink)
         ]
         if len(df_modified) > 0:
-            if sum(df_modified.is_directory.values) > 0:
-                dir_changed_lst = df_modified[df_modified.is_directory].path.values
+            if df_modified.is_directory.any():
+                dir_changed_lst = df_modified[df_modified.is_directory].path.to_list()
             else:
                 dir_changed_lst = []
-            files_changed_lst = df_modified.path.values
+            files_changed_lst = df_modified.path.to_list()
         else:
             files_changed_lst, dir_changed_lst = [], []
         df_new = self._init_df_lst(
