@@ -2,7 +2,6 @@ import os
 from collections.abc import Generator
 from typing import Callable, Optional
 
-import numpy as np
 import pandas
 
 
@@ -78,12 +77,10 @@ class PyFileIndex:
                 filter_function=self._filter_function,
                 debug=self._debug,
                 df=self._df[
-                    np.array(
-                        [
-                            p.replace("\\", "/").contains(abs_path_unix)
-                            for p in self._df["path"].values
-                        ]
-                    )
+                    [
+                        p.replace("\\", "/").contains(abs_path_unix)
+                        for p in self._df["path"].values
+                    ]
                 ],
             )
         else:
@@ -192,14 +189,14 @@ class PyFileIndex:
             tuple: pandas.DataFrame with new entries, list of changed files, and list of deleted paths
         """
         path_exists_bool_lst = [os.path.exists(p) for p in self._df.path.values]
-        path_deleted_lst = self._df[~np.array(path_exists_bool_lst)].path.values
+        path_deleted_lst = self._df[~path_exists_bool_lst].path.values
         df_exists = self._df[path_exists_bool_lst]
         stat_lst = [os.stat(p) for p in df_exists.path.values]
-        st_mtime = [s.st_mtime for s in stat_lst]
-        st_nlink = [s.st_nlink for s in stat_lst]
+        st_mtime = pandas.Series([s.st_mtime for s in stat_lst], index=df_exists.index)
+        st_nlink = pandas.Series([s.st_nlink for s in stat_lst], index=df_exists.index)
         df_modified = df_exists[
-            ~np.isclose(df_exists.mtime.values, st_mtime, rtol=1e-10, atol=1e-15)
-            | np.not_equal(df_exists.nlink.values, st_nlink)
+            ((df_exists.mtime - st_mtime).abs() > (1e-15 + 1e-10 * st_mtime.abs()))
+            | (df_exists.nlink != st_nlink)
         ]
         if len(df_modified) > 0:
             if sum(df_modified.is_directory.values) > 0:

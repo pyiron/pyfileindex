@@ -1,8 +1,7 @@
 channels:
-  - conda-forge
+- conda-forge
 dependencies:
-  - hatchling =1.27.0
-  - hatch-vcs =0.4.0
-  - numpy =1.23.5
-  - pandas =1.5.3
-  - scandir =1.10.0
+- hatchling =1.27.0
+- hatch-vcs =0.4.0
+- pandas =1.5.3
+- scandir =1.10.0

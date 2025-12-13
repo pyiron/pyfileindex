@@ -4,5 +4,4 @@ dependencies:
 - python
 - hatchling
 - hatch-vcs
-- numpy
 - pandas
