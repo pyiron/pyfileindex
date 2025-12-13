@@ -66,7 +66,7 @@ class PyFileIndex:
                 path=abs_path,
                 filter_function=self._filter_function,
                 debug=self._debug,
-                df=self._df[self._df["path"].str.contains(abs_path)],
+                df=self._df[self._df.path.str.contains(abs_path)],
             )
         elif (
             os.path.commonpath([abs_path, self._path]) == self._path and os.name != "nt"
@@ -79,7 +79,7 @@ class PyFileIndex:
                 df=self._df[
                     [
                         p.replace("\\", "/").contains(abs_path_unix)
-                        for p in self._df["path"].values
+                        for p in self._df.path.values
                     ]
                 ],
             )
@@ -188,7 +188,7 @@ class PyFileIndex:
         Returns:
             tuple: pandas.DataFrame with new entries, list of changed files, and list of deleted paths
         """
-        path_exists_bool_lst = [os.path.exists(p) for p in self._df.path.values]
+        path_exists_bool_lst = self._df.path.apply(os.path.exists)
         path_deleted_lst = self._df[~path_exists_bool_lst].path.values
         df_exists = self._df[path_exists_bool_lst]
         stat_lst = [os.stat(p) for p in df_exists.path.values]
