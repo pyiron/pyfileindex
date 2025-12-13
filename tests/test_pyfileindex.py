@@ -5,7 +5,6 @@ import shutil
 from time import sleep
 import pandas
 import pytest
-from unittest.mock import patch, MagicMock
 
 from pyfileindex import PyFileIndex
 
@@ -365,29 +364,29 @@ def job_file_table_coverage_fixture():
     yield path, fi
 
 
-def test_scandir_import_error(job_file_table_coverage_fixture):
+def test_scandir_import_error(job_file_table_coverage_fixture, mocker):
     path, _ = job_file_table_coverage_fixture
-    with patch.dict(sys.modules, {'os.scandir': None}):
-        import pyfileindex.pyfileindex
-        importlib.reload(pyfileindex.pyfileindex)
-        fi = pyfileindex.pyfileindex.PyFileIndex(path=path)
-        assert isinstance(fi, pyfileindex.pyfileindex.PyFileIndex)
+    mocker.patch.dict(sys.modules, {'os.scandir': None})
+    import pyfileindex.pyfileindex
+    importlib.reload(pyfileindex.pyfileindex)
+    fi = pyfileindex.pyfileindex.PyFileIndex(path=path)
+    assert isinstance(fi, pyfileindex.pyfileindex.PyFileIndex)
     import pyfileindex.pyfileindex
     importlib.reload(pyfileindex.pyfileindex)
 
 
-def test_open_windows(job_file_table_coverage_fixture):
+def test_open_windows(job_file_table_coverage_fixture, mocker):
     path, _ = job_file_table_coverage_fixture
-    with patch('os.name', 'nt'):
-        p_name = os.path.join(path, "test_open_windows")
-        os.makedirs(p_name, exist_ok=True)
-        # To cover the second nt path, we need to create a new PyFileIndex inside the patch
-        fi = PyFileIndex(path=path)
-        fi_new = fi.open(p_name)
-        assert fi_new != fi
-        assert len(fi_new.df) == 1
-        assert fi_new.df.iloc[0].path == os.path.abspath(p_name)
-        os.removedirs(p_name)
+    mocker.patch('os.name', 'nt')
+    p_name = os.path.join(path, "test_open_windows")
+    os.makedirs(p_name, exist_ok=True)
+    # To cover the second nt path, we need to create a new PyFileIndex inside the patch
+    fi = PyFileIndex(path=path)
+    fi_new = fi.open(p_name)
+    assert fi_new != fi
+    assert len(fi_new.df) == 1
+    assert fi_new.df.iloc[0].path == os.path.abspath(p_name)
+    os.removedirs(p_name)
 
 
 def test_get_lst_entry_from_path_with_filter(job_file_table_coverage_fixture):
@@ -414,9 +413,9 @@ def test_get_lst_entry_from_path_file_not_found(job_file_table_coverage_fixture)
     assert result == []
 
 
-def test_get_lst_entry_file_not_found(job_file_table_coverage_fixture):
+def test_get_lst_entry_file_not_found(job_file_table_coverage_fixture, mocker):
     _, fi = job_file_table_coverage_fixture
-    mock_entry = MagicMock()
+    mock_entry = mocker.MagicMock()
     mock_entry.name = "test_file"
     mock_entry.path = "/path/to/test_file"
     mock_entry.is_dir.return_value = False
