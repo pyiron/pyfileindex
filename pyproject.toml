@@ -94,4 +94,4 @@ path = "src/pyfileindex/_version.py"
 
 [tool.coverage.run]
 source = ["pyfileindex"]
-command_line = "-m unittest discover tests"
+command_line = "-m pytest tests/"
