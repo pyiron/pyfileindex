@@ -77,10 +77,7 @@ class PyFileIndex:
                 filter_function=self._filter_function,
                 debug=self._debug,
                 df=self._df[
-                    [
-                        p.replace("\\", "/").contains(abs_path_unix)
-                        for p in self._df.path.values
-                    ]
+                    self._df.path.str.replace("\\", "/").str.contains(abs_path_unix)
                 ],
             )
         else:
