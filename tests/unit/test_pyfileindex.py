@@ -373,7 +373,7 @@ class TestJobFileTable(unittest.TestCase):
 
     def test_len(self):
         self.assertEqual(0, len(self.fi_with_filter))
-        self.assertEqual(2, len(self.fi_without_filter))
+        self.assertEqual(4, len(self.fi_without_filter))
         self.assertEqual(0, len(self.fi_debug))
 
     def test_open(self):
