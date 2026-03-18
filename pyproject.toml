@@ -93,3 +93,13 @@ path = "src/pyfileindex/_version.py"
 [tool.coverage.run]
 source = ["pyfileindex"]
 command_line = "-m unittest discover tests"
+
+[tool.pixi.workspace]
+channels = ["conda-forge"]
+platforms = ["linux-64", "linux-aarch64", "osx-64", "osx-arm64", "win-64"]
+
+[tool.pixi.dependencies]
+pandas = "==3.0.1"
+
+[tool.pixi.tasks]
+test = "python -m unittest discover tests"
