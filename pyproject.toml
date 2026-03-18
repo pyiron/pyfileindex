@@ -114,10 +114,10 @@ python = "3.11.*"
 python = "3.12.*"
 
 [tool.pixi.feature.py313.dependencies]
-python = "3.11.*"
+python = "3.13.*"
 
 [tool.pixi.feature.py314.dependencies]
-python = "3.12.*"
+python = "3.14.*"
 
 [tool.pixi.environments]
 py311 = ["py311"]

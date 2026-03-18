@@ -212,7 +212,7 @@ jobs:
       uses: prefix-dev/setup-pixi@v0
       with:
         cache: true
-        environments: ${{ matrix.environment }}
+        environments: [${{ matrix.environment }}]
     - name: Test
       run: pixi run test
 
