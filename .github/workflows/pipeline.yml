@@ -158,37 +158,53 @@ jobs:
     strategy:
       matrix:
         include:
-        - operating-system: macos-latest
-          python-version: '3.14'
-          label: osx-64-py-3-14
+        - operating-system: ubuntu-24.04-arm
+          environment: 'py314'
 
         - operating-system: ubuntu-24.04-arm
-          python-version: '3.14'
-          label: linux-arm-24-py-3-14
+          environment: 'py313'
 
-        - operating-system: ubuntu-22.04-arm
-          python-version: '3.14'
-          label: linux-arm-22-py-3-14
+        - operating-system: ubuntu-24.04-arm
+          environment: 'py312'
+
+        - operating-system: ubuntu-24.04-arm
+          environment: 'py311'
+
+        - operating-system: macos-latest
+          environment: 'py314'
+
+        - operating-system: macos-latest
+          environment: 'py313'
+
+        - operating-system: macos-latest
+          environment: 'py312'
+
+        - operating-system: macos-latest
+          environment: 'py311'
 
         - operating-system: windows-latest
-          python-version: '3.14'
-          label: win-64-py-3-14
+          environment: 'py314'
+
+        - operating-system: windows-latest
+          environment: 'py313'
+
+        - operating-system: windows-latest
+          environment: 'py312'
+
+        - operating-system: windows-latest
+          environment: 'py311'
 
         - operating-system: ubuntu-latest
-          python-version: '3.14'
-          label: linux-64-py-3-14
+          environment: 'py314'
 
         - operating-system: ubuntu-latest
-          python-version: '3.13'
-          label: linux-64-py-3-13
+          environment: 'py313'
 
         - operating-system: ubuntu-latest
-          python-version: '3.12'
-          label: linux-64-py-3-12
+          environment: 'py312'
 
         - operating-system: ubuntu-latest
-          python-version: '3.11'
-          label: linux-64-py-3-11
+          environment: 'py311'
 
     steps:
     - uses: actions/checkout@v4
@@ -196,9 +212,8 @@ jobs:
       uses: prefix-dev/setup-pixi@v0
       with:
         cache: true
-        python-version: ${{ matrix.python-version }}
+        environments: ${{ matrix.python-version }}
     - name: Test
-      shell: bash -l {0}
       run: pixi run test
 
   unittest_old:

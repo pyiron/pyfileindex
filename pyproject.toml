@@ -106,3 +106,21 @@ pyfileindex = { path = ".", editable = true }
 
 [tool.pixi.tasks]
 test = "python -m unittest discover tests"
+
+[tool.pixi.feature.py311.dependencies]
+python = "3.11.*"
+
+[tool.pixi.feature.py312.dependencies]
+python = "3.12.*"
+
+[tool.pixi.feature.py313.dependencies]
+python = "3.11.*"
+
+[tool.pixi.feature.py314.dependencies]
+python = "3.12.*"
+
+[tool.pixi.environments]
+py311 = ["py311"]
+py312 = ["py312"]
+py313 = ["py313"]
+py314 = ["py314"]
