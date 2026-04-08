@@ -152,6 +152,70 @@ jobs:
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
 
+  unittest_pixi:
+    needs: [black]
+    runs-on: ${{ matrix.operating-system }}
+    strategy:
+      matrix:
+        include:
+        - operating-system: ubuntu-24.04-arm
+          environment: 'py314'
+
+        - operating-system: ubuntu-24.04-arm
+          environment: 'py313'
+
+        - operating-system: ubuntu-24.04-arm
+          environment: 'py312'
+
+        - operating-system: ubuntu-24.04-arm
+          environment: 'py311'
+
+        - operating-system: macos-latest
+          environment: 'py314'
+
+        - operating-system: macos-latest
+          environment: 'py313'
+
+        - operating-system: macos-latest
+          environment: 'py312'
+
+        - operating-system: macos-latest
+          environment: 'py311'
+
+        - operating-system: windows-latest
+          environment: 'py314'
+
+        - operating-system: windows-latest
+          environment: 'py313'
+
+        - operating-system: windows-latest
+          environment: 'py312'
+
+        - operating-system: windows-latest
+          environment: 'py311'
+
+        - operating-system: ubuntu-latest
+          environment: 'py314'
+
+        - operating-system: ubuntu-latest
+          environment: 'py313'
+
+        - operating-system: ubuntu-latest
+          environment: 'py312'
+
+        - operating-system: ubuntu-latest
+          environment: 'py311'
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Setup pixi
+      uses: prefix-dev/setup-pixi@v0
+      with:
+        cache: true
+        environments: ${{ matrix.environment }}
+    - name: Test
+      run: pixi run test
+
   unittest_old:
     needs: [black]
     runs-on: ubuntu-latest
