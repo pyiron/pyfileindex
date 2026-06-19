@@ -40,7 +40,9 @@ class PyFileIndex:
         self._pending_changes: set = set()
         self._watch_stop_event: Optional[threading.Event] = None
         self._watch_thread: Optional[threading.Thread] = None
-        self._watch_generator = None
+        self._watch_generator: Optional[
+            Generator[set[tuple[watchfiles.Change, str]], None, None]
+        ] = None
         if watch:
             self._start_watch()
         if df is None:
@@ -238,7 +240,8 @@ class PyFileIndex:
             rust_timeout=50,
             yield_on_timeout=True,
         )
-        next(self._watch_generator)
+        if self._watch_generator is not None:
+            next(self._watch_generator)
         self._watch_thread = threading.Thread(target=self._watch_worker, daemon=True)
         self._watch_thread.start()
 
@@ -247,6 +250,8 @@ class PyFileIndex:
         Internal function run in a background thread to collect file system
         changes reported by watchfiles into self._pending_changes
         """
+        if self._watch_generator is None:
+            return
         try:
             for changes in self._watch_generator:
                 if len(changes) != 0:
