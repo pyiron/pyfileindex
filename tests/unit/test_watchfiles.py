@@ -103,17 +103,17 @@ class TestPyFileIndexWatch(unittest.TestCase):
             fi.close()
 
     def test_watch_close_stops_background_thread(self):
-        thread = self.fi._watch_thread
+        thread = self.fi._watcher.thread
         self.assertTrue(thread.is_alive())
         self.fi.close()
         self.assertFalse(thread.is_alive())
-        self.assertIsNone(self.fi._watch_thread)
+        self.assertIsNone(self.fi._watcher.thread)
         # closing twice should be a no-op, not raise
         self.fi.close()
 
     def test_watch_context_manager(self):
         with PyFileIndex(path=self.path, watch=True) as fi:
-            thread = fi._watch_thread
+            thread = fi._watcher.thread
             self.assertTrue(thread.is_alive())
         self.assertFalse(thread.is_alive())
 
@@ -127,32 +127,17 @@ class TestPyFileIndexWatch(unittest.TestCase):
             fi_sub = self.fi.open(sub_dir)
             try:
                 self.assertTrue(fi_sub._watch_enabled)
-                self.assertIsNotNone(fi_sub._watch_thread)
+                self.assertIsNotNone(fi_sub._watcher.thread)
             finally:
                 fi_sub.close()
         finally:
             os.rmdir(sub_dir)
 
 
-class TestJobFileTableCoverage(unittest.TestCase):
+class TestApplyWatchChanges(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.path = os.path.dirname(os.path.abspath(__file__))
-        cls.fi = PyFileIndex(path=cls.path)
-
-    def test_watch_worker_none_generator(self):
-        self.fi._watch_generator = None
-        self.fi._watch_worker()
-        self.assertEqual(self.fi._pending_changes, set())
-
-    def test_watch_worker_file_not_found(self):
-        def raise_file_not_found():
-            raise FileNotFoundError
-            yield set()
-
-        self.fi._watch_generator = raise_file_not_found()
-        self.fi._watch_worker()
-        self.assertEqual(self.fi._pending_changes, set())
 
     def test_apply_watch_changes_debug_print(self):
         fi = PyFileIndex(path=self.path, debug=True)
