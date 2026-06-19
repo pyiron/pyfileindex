@@ -1,4 +1,5 @@
 import threading
+import time
 import unittest
 from unittest.mock import MagicMock, patch
 
@@ -47,9 +48,32 @@ class TestFileSystemWatcher(unittest.TestCase):
         watcher = FileSystemWatcher(path=".")
         change = (watchfiles.Change.added, "/some/path")
         watcher._pending_changes = {change}
+        watcher._changes_available.set()
         drained = watcher.drain_pending_changes()
         self.assertEqual(drained, {change})
         self.assertEqual(watcher._pending_changes, set())
+        self.assertFalse(watcher._changes_available.is_set())
+
+    def test_drain_pending_changes_without_timeout_does_not_wait(self):
+        watcher = FileSystemWatcher(path=".")
+        start = time.monotonic()
+        drained = watcher.drain_pending_changes(timeout=0)
+        self.assertEqual(drained, set())
+        self.assertLess(time.monotonic() - start, 1)
+
+    def test_drain_pending_changes_waits_for_late_arriving_change(self):
+        watcher = FileSystemWatcher(path=".")
+        change = (watchfiles.Change.added, "/some/path")
+
+        def add_change_after_delay():
+            time.sleep(0.05)
+            with watcher._lock:
+                watcher._pending_changes.add(change)
+                watcher._changes_available.set()
+
+        threading.Thread(target=add_change_after_delay).start()
+        drained = watcher.drain_pending_changes(timeout=1)
+        self.assertEqual(drained, {change})
 
     def test_start_advances_generator_and_starts_thread(self):
         release = threading.Event()

@@ -102,13 +102,23 @@ class PyFileIndex:
                 watch=self._watch_enabled,
             )
 
-    def update(self) -> None:
+    def update(self, timeout: float = 0.1) -> None:
         """
         Update file index
+
+        Args:
+            timeout (float): when watch=True, a filesystem change made just
+                before calling update() may not have reached the background
+                watcher yet. timeout is the max time in seconds to wait for
+                such a pending change to arrive before applying whatever is
+                available. Ignored when watch=False (optional, default
+                100ms, matching watchfiles' own minimum reporting latency).
         """
         self._check_if_path_exists(path=self._path)
         if self._watcher is not None:
-            self._apply_watch_changes(changes=self._watcher.drain_pending_changes())
+            self._apply_watch_changes(
+                changes=self._watcher.drain_pending_changes(timeout=timeout)
+            )
             return
         df_new, files_changed_lst, path_deleted_lst = self._get_changes_quick()
         if self._debug:
