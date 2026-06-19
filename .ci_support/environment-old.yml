@@ -5,3 +5,4 @@ dependencies:
 - hatch-vcs =0.4.0
 - pandas =1.5.3
 - scandir =1.10.0
+- watchfiles =1.1.1
