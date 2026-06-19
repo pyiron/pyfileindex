@@ -40,7 +40,7 @@ class PyFileIndex:
         self._watch_stop_event: Optional[threading.Event] = None
         self._watch_thread: Optional[threading.Thread] = None
         self._watch_generator: Optional[
-            Generator[set[tuple[watchfiles.Change, str]], None, None]
+            Generator[set[tuple], None, None]
         ] = None
         if watch:
             self._start_watch()
