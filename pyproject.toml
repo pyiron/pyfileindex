@@ -31,9 +31,11 @@ classifiers = [
 ]
 dependencies = [
     "pandas==3.0.3",
-    "watchfiles==1.2.0",
 ]
 dynamic = ["version"]
+
+[project.optional-dependencies]
+watchfiles = ["watchfiles==1.2.0"]
 
 [project.urls]
 Homepage = "https://github.com/pyiron/pyfileindex"
@@ -67,6 +69,8 @@ select = [
 ignore = [
     # ignore line-length violations
     "E501",
+    # ignore imports which are not at the top of a module
+    "PLC0415",
 ]
 
 [tool.hatch.build]
