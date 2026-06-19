@@ -3,6 +3,8 @@ import time
 import unittest
 import os
 
+from unittest.mock import patch
+
 from pyfileindex import PyFileIndex
 
 try:
@@ -130,3 +132,35 @@ class TestPyFileIndexWatch(unittest.TestCase):
                 fi_sub.close()
         finally:
             os.rmdir(sub_dir)
+
+
+class TestJobFileTableCoverage(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.path = os.path.dirname(os.path.abspath(__file__))
+        cls.fi = PyFileIndex(path=cls.path)
+
+    def test_watch_worker_none_generator(self):
+        self.fi._watch_generator = None
+        self.fi._watch_worker()
+        self.assertEqual(self.fi._pending_changes, set())
+
+    def test_watch_worker_file_not_found(self):
+        def raise_file_not_found():
+            raise FileNotFoundError
+            yield set()
+
+        self.fi._watch_generator = raise_file_not_found()
+        self.fi._watch_worker()
+        self.assertEqual(self.fi._pending_changes, set())
+
+    def test_apply_watch_changes_debug_print(self):
+        fi = PyFileIndex(path=self.path, debug=True)
+        try:
+            with patch("builtins.print") as mock_print:
+                fi._apply_watch_changes(
+                    {(watchfiles.Change.deleted, os.path.join(self.path, "missing"))}
+                )
+                mock_print.assert_called()
+        finally:
+            fi.close()

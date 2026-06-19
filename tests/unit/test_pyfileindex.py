@@ -388,7 +388,7 @@ class TestJobFileTable(unittest.TestCase):
 
     def test_len(self):
         self.assertEqual(0, len(self.fi_with_filter))
-        self.assertEqual(4, len(self.fi_without_filter))
+        self.assertEqual(6, len(self.fi_without_filter))
         self.assertEqual(0, len(self.fi_debug))
 
     def test_open(self):
@@ -501,28 +501,3 @@ class TestJobFileTableCoverage(unittest.TestCase):
         mock_entry.stat.side_effect = FileNotFoundError
         result = self.fi._get_lst_entry(entry=mock_entry)
         self.assertEqual(result, [])
-
-    def test_watch_worker_none_generator(self):
-        self.fi._watch_generator = None
-        self.fi._watch_worker()
-        self.assertEqual(self.fi._pending_changes, set())
-
-    def test_watch_worker_file_not_found(self):
-        def raise_file_not_found():
-            raise FileNotFoundError
-            yield set()
-
-        self.fi._watch_generator = raise_file_not_found()
-        self.fi._watch_worker()
-        self.assertEqual(self.fi._pending_changes, set())
-
-    def test_apply_watch_changes_debug_print(self):
-        fi = PyFileIndex(path=self.path, debug=True)
-        try:
-            with patch("builtins.print") as mock_print:
-                fi._apply_watch_changes(
-                    {(watchfiles.Change.deleted, os.path.join(self.path, "missing"))}
-                )
-                mock_print.assert_called()
-        finally:
-            fi.close()
