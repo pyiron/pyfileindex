@@ -1,10 +1,11 @@
 import contextlib
 import os
-import threading
 from collections.abc import Generator
 from typing import Callable, Optional
 
 import pandas
+
+from pyfileindex.watcher import FileSystemWatcher
 
 
 class PyFileIndex:
@@ -35,13 +36,10 @@ class PyFileIndex:
         self._filter_function = filter_function
         self._path = abs_path
         self._watch_enabled = watch
-        self._watch_lock = threading.Lock()
-        self._pending_changes: set = set()
-        self._watch_stop_event: Optional[threading.Event] = None
-        self._watch_thread: Optional[threading.Thread] = None
-        self._watch_generator: Optional[Generator[set[tuple], None, None]] = None
+        self._watcher: Optional[FileSystemWatcher] = None
         if watch:
-            self._start_watch()
+            self._watcher = FileSystemWatcher(path=self._path)
+            self._watcher.start()
         if df is None:
             self._df = self._create_df_from_lst(
                 [self._get_lst_entry_from_path(entry=self._path)]
@@ -109,8 +107,8 @@ class PyFileIndex:
         Update file index
         """
         self._check_if_path_exists(path=self._path)
-        if self._watch_enabled:
-            self._apply_watch_changes(changes=self._drain_pending_changes())
+        if self._watcher is not None:
+            self._apply_watch_changes(changes=self._watcher.drain_pending_changes())
             return
         df_new, files_changed_lst, path_deleted_lst = self._get_changes_quick()
         if self._debug:
@@ -139,11 +137,8 @@ class PyFileIndex:
         Stop the background file system watcher started with watch=True. Safe to
         call even if no watcher is running.
         """
-        if self._watch_stop_event is not None:
-            self._watch_stop_event.set()
-        if self._watch_thread is not None:
-            self._watch_thread.join(timeout=5)
-            self._watch_thread = None
+        if self._watcher is not None:
+            self._watcher.stop()
 
     def __enter__(self) -> "PyFileIndex":
         return self
@@ -218,59 +213,6 @@ class PyFileIndex:
                             yield self._get_lst_entry(entry=entry)
         except FileNotFoundError:
             yield from ()
-
-    def _start_watch(self) -> None:
-        """
-        Internal function to start the background file system watcher
-
-        watchfiles.watch() only registers the underlying OS-level watch the
-        first time the generator is advanced, which otherwise happens lazily
-        inside the background thread. To avoid missing changes made right
-        after construction, the generator is advanced once synchronously here
-        before the background thread takes over.
-        """
-        import watchfiles
-
-        self._watch_stop_event = threading.Event()
-        self._watch_generator = watchfiles.watch(
-            self._path,
-            watch_filter=None,
-            stop_event=self._watch_stop_event,
-            rust_timeout=50,
-            yield_on_timeout=True,
-        )
-        if self._watch_generator is not None:
-            next(self._watch_generator)
-        self._watch_thread = threading.Thread(target=self._watch_worker, daemon=True)
-        self._watch_thread.start()
-
-    def _watch_worker(self) -> None:
-        """
-        Internal function run in a background thread to collect file system
-        changes reported by watchfiles into self._pending_changes
-        """
-        if self._watch_generator is None:
-            return
-        try:
-            for changes in self._watch_generator:
-                if len(changes) != 0:
-                    with self._watch_lock:
-                        self._pending_changes.update(changes)
-        except FileNotFoundError:
-            pass
-
-    def _drain_pending_changes(self) -> set:
-        """
-        Internal function to atomically take the file system changes collected
-        by the background watcher since the last call
-
-        Returns:
-            set: set of (watchfiles.Change, path) tuples
-        """
-        with self._watch_lock:
-            changes = self._pending_changes
-            self._pending_changes = set()
-        return changes
 
     def _apply_watch_changes(self, changes: set) -> None:
         """
