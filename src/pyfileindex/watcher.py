@@ -20,6 +20,7 @@ class FileSystemWatcher:
         self._path = path
         self._lock = threading.Lock()
         self._pending_changes: set = set()
+        self._changes_available = threading.Event()
         self._stop_event: Optional[threading.Event] = None
         self._thread: Optional[threading.Thread] = None
         self._generator: Optional[Generator[set[tuple], None, None]] = None
@@ -64,17 +65,32 @@ class FileSystemWatcher:
             self._thread.join(timeout=5)
             self._thread = None
 
-    def drain_pending_changes(self) -> set:
+    def drain_pending_changes(self, timeout: float = 0.0) -> set:
         """
         Atomically take the file system changes collected since the last
         call.
 
+        A change made on disk is not visible immediately: it takes a small
+        amount of time for the OS to report it and for the background thread
+        to pick it up. If timeout is 0, whatever has arrived so far is
+        returned right away, which may be nothing even though a change just
+        happened. Passing a small timeout instead waits for that change to
+        arrive (or for the timeout to elapse) before returning, without
+        blocking any longer than necessary.
+
+        Args:
+            timeout (float): max time in seconds to wait for a pending
+                change to arrive if none is available yet (optional)
+
         Returns:
             set: set of (watchfiles.Change, path) tuples
         """
+        if timeout > 0:
+            self._changes_available.wait(timeout)
         with self._lock:
             changes = self._pending_changes
             self._pending_changes = set()
+            self._changes_available.clear()
         return changes
 
     def _worker(self) -> None:
@@ -89,5 +105,6 @@ class FileSystemWatcher:
                 if len(changes) != 0:
                     with self._lock:
                         self._pending_changes.update(changes)
+                        self._changes_available.set()
         except FileNotFoundError:
             pass

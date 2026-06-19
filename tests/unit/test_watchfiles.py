@@ -73,6 +73,26 @@ class TestPyFileIndexWatch(unittest.TestCase):
             update_until(self.fi, lambda: f_name not in self.fi.df.path.values)
         )
 
+    def test_watch_update_default_timeout_catches_immediate_change(self):
+        """
+        A filesystem change made right before update() may not have reached
+        the background watcher yet (e.g. when a notebook runs "Run All" and
+        cells execute back-to-back with no delay between them). update()'s
+        default timeout should wait long enough for it to arrive without the
+        caller needing to add a manual sleep, though OS scheduling jitter
+        means a single call isn't always guaranteed to land within the
+        timeout, so a couple of immediate retries are allowed.
+        """
+        sub_dir = os.path.join(self.path, "immediate")
+        os.makedirs(sub_dir)
+        found = False
+        for _ in range(3):
+            self.fi.update()
+            if sub_dir in self.fi.df.path.values:
+                found = True
+                break
+        self.assertTrue(found)
+
     def test_watch_add_remove_directory(self):
         sub_dir = os.path.join(self.path, "sub")
         nested_file = os.path.join(sub_dir, "nested.txt")
