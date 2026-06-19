@@ -91,6 +91,26 @@ jobs:
         uv sync --all-extras --dev
         pip check
 
+  minimal:
+    needs: [black]
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Conda config
+      shell: bash -l {0}
+      run: echo -e "channels:\n  - conda-forge\n" > .condarc
+    - uses: conda-incubator/setup-miniconda@v3
+      with:
+        python-version: '3.14'
+        miniforge-version: latest
+        condarc-file: .condarc
+        environment-file: .ci_support/environment.yml
+    - name: Test
+      shell: bash -l {0}
+      run: |
+        pip install . --no-deps --no-build-isolation
+        python -m unittest discover tests
+
   unittest_matrix:
     needs: [black]
     runs-on: ${{ matrix.operating-system }}
@@ -172,7 +192,7 @@ jobs:
         python -m unittest discover tests
 
   autobot:
-    needs: [uv_check, unittest_old, unittest_matrix, pip_check, mypy]
+    needs: [uv_check, unittest_old, unittest_matrix, pip_check, mypy, minimal]
     permissions:
       contents: write
       pull-requests: write
