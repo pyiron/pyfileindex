@@ -7,6 +7,7 @@ import sys
 from time import sleep
 
 import pandas
+import watchfiles
 from unittest.mock import patch, MagicMock
 
 from pyfileindex import PyFileIndex
@@ -465,6 +466,17 @@ class TestJobFileTableCoverage(unittest.TestCase):
             self.assertEqual(fi_new.df.iloc[0].path, os.path.abspath(p_name))
             os.removedirs(p_name)
 
+    def test_open_windows_fallback_branch(self):
+        p_name = os.path.join(self.path, "test_open_windows_fallback")
+        os.makedirs(p_name, exist_ok=True)
+        fi = PyFileIndex(path=self.path)
+        with patch("os.path.commonpath", side_effect=["", self.path]):
+            fi_new = fi.open(p_name)
+        self.assertNotEqual(fi_new, fi)
+        self.assertEqual(len(fi_new.df), 1)
+        self.assertEqual(fi_new.df.iloc[0].path, os.path.abspath(p_name))
+        os.removedirs(p_name)
+
     def test_get_lst_entry_from_path_with_filter(self):
         def my_filter(file_name):
             return ".pdb" in file_name
@@ -491,6 +503,31 @@ class TestJobFileTableCoverage(unittest.TestCase):
         mock_entry.stat.side_effect = FileNotFoundError
         result = self.fi._get_lst_entry(entry=mock_entry)
         self.assertEqual(result, [])
+
+    def test_watch_worker_none_generator(self):
+        self.fi._watch_generator = None
+        self.fi._watch_worker()
+        self.assertEqual(self.fi._pending_changes, set())
+
+    def test_watch_worker_file_not_found(self):
+        def raise_file_not_found():
+            raise FileNotFoundError
+            yield set()
+
+        self.fi._watch_generator = raise_file_not_found()
+        self.fi._watch_worker()
+        self.assertEqual(self.fi._pending_changes, set())
+
+    def test_apply_watch_changes_debug_print(self):
+        fi = PyFileIndex(path=self.path, debug=True)
+        try:
+            with patch("builtins.print") as mock_print:
+                fi._apply_watch_changes(
+                    {(watchfiles.Change.deleted, os.path.join(self.path, "missing"))}
+                )
+                mock_print.assert_called()
+        finally:
+            fi.close()
 
 
 class TestPyFileIndexWatch(unittest.TestCase):
