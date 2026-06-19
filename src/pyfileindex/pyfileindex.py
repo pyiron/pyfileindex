@@ -1,8 +1,11 @@
+import contextlib
 import os
+import threading
 from collections.abc import Generator
 from typing import Callable, Optional
 
 import pandas
+import watchfiles
 
 
 class PyFileIndex:
@@ -14,6 +17,9 @@ class PyFileIndex:
         filter_function (Callable): function to filter for specific files (optional)
         debug (bool): enable debug print statements (optional)
         df (pandas.DataFrame): DataFrame of a previous PyFileIndex object (optional)
+        watch (bool): keep the file index in sync using a background file system
+            watcher instead of rescanning the file system on every update() call
+            (optional)
     """
 
     def __init__(
@@ -22,12 +28,23 @@ class PyFileIndex:
         filter_function: Optional[Callable] = None,
         debug: bool = False,
         df: Optional[pandas.DataFrame] = None,
+        watch: bool = False,
     ) -> None:
         abs_path = os.path.abspath(os.path.expanduser(path))
         self._check_if_path_exists(path=abs_path)
         self._debug = debug
         self._filter_function = filter_function
         self._path = abs_path
+        self._watch_enabled = watch
+        self._watch_lock = threading.Lock()
+        self._pending_changes: set = set()
+        self._watch_stop_event: Optional[threading.Event] = None
+        self._watch_thread: Optional[threading.Thread] = None
+        self._watch_generator: Optional[
+            Generator[set[tuple[watchfiles.Change, str]], None, None]
+        ] = None
+        if watch:
+            self._start_watch()
         if df is None:
             self._df = self._create_df_from_lst(
                 [self._get_lst_entry_from_path(entry=self._path)]
@@ -67,6 +84,7 @@ class PyFileIndex:
                 filter_function=self._filter_function,
                 debug=self._debug,
                 df=self._df[self._df.path.str.contains(abs_path)],
+                watch=self._watch_enabled,
             )
         elif (
             os.path.commonpath([abs_path, self._path]) == self._path and os.name != "nt"
@@ -79,12 +97,14 @@ class PyFileIndex:
                 df=self._df[
                     self._df.path.str.replace("\\", "/").str.contains(abs_path_unix)
                 ],
+                watch=self._watch_enabled,
             )
         else:
             return PyFileIndex(
                 path=abs_path,
                 filter_function=self._filter_function,
                 debug=self._debug,
+                watch=self._watch_enabled,
             )
 
     def update(self) -> None:
@@ -92,6 +112,9 @@ class PyFileIndex:
         Update file index
         """
         self._check_if_path_exists(path=self._path)
+        if self._watch_enabled:
+            self._apply_watch_changes(changes=self._drain_pending_changes())
+            return
         df_new, files_changed_lst, path_deleted_lst = self._get_changes_quick()
         if self._debug:
             print("Changes: ", df_new.path.values, files_changed_lst, path_deleted_lst)
@@ -113,6 +136,27 @@ class PyFileIndex:
                 .drop_duplicates()
                 .reset_index(drop=True)
             )
+
+    def close(self) -> None:
+        """
+        Stop the background file system watcher started with watch=True. Safe to
+        call even if no watcher is running.
+        """
+        if self._watch_stop_event is not None:
+            self._watch_stop_event.set()
+        if self._watch_thread is not None:
+            self._watch_thread.join(timeout=5)
+            self._watch_thread = None
+
+    def __enter__(self) -> "PyFileIndex":
+        return self
+
+    def __exit__(self, exc_type, exc_value, traceback) -> None:
+        self.close()
+
+    def __del__(self) -> None:
+        with contextlib.suppress(Exception):
+            self.close()
 
     def _init_df_lst(
         self,
@@ -177,6 +221,102 @@ class PyFileIndex:
                             yield self._get_lst_entry(entry=entry)
         except FileNotFoundError:
             yield from ()
+
+    def _start_watch(self) -> None:
+        """
+        Internal function to start the background file system watcher
+
+        watchfiles.watch() only registers the underlying OS-level watch the
+        first time the generator is advanced, which otherwise happens lazily
+        inside the background thread. To avoid missing changes made right
+        after construction, the generator is advanced once synchronously here
+        before the background thread takes over.
+        """
+        self._watch_stop_event = threading.Event()
+        self._watch_generator = watchfiles.watch(
+            self._path,
+            watch_filter=None,
+            stop_event=self._watch_stop_event,
+            rust_timeout=50,
+            yield_on_timeout=True,
+        )
+        if self._watch_generator is not None:
+            next(self._watch_generator)
+        self._watch_thread = threading.Thread(target=self._watch_worker, daemon=True)
+        self._watch_thread.start()
+
+    def _watch_worker(self) -> None:
+        """
+        Internal function run in a background thread to collect file system
+        changes reported by watchfiles into self._pending_changes
+        """
+        if self._watch_generator is None:
+            return
+        try:
+            for changes in self._watch_generator:
+                if len(changes) != 0:
+                    with self._watch_lock:
+                        self._pending_changes.update(changes)
+        except FileNotFoundError:
+            pass
+
+    def _drain_pending_changes(self) -> set:
+        """
+        Internal function to atomically take the file system changes collected
+        by the background watcher since the last call
+
+        Returns:
+            set: set of (watchfiles.Change, path) tuples
+        """
+        with self._watch_lock:
+            changes = self._pending_changes
+            self._pending_changes = set()
+        return changes
+
+    def _apply_watch_changes(self, changes: set) -> None:
+        """
+        Internal function to apply the changes collected by the background
+        watcher to the file index
+
+        Args:
+            changes (set): set of (watchfiles.Change, path) tuples
+        """
+        if len(changes) == 0:
+            return
+        deleted_lst = [
+            p for change, p in changes if change == watchfiles.Change.deleted
+        ]
+        changed_lst = [
+            p for change, p in changes if change != watchfiles.Change.deleted
+        ]
+        if self._debug:
+            print("Changes: ", changed_lst, deleted_lst)
+        if len(deleted_lst) != 0:
+            prefix_tuple = tuple(p + os.sep for p in deleted_lst)
+            self._df = self._df[
+                ~(
+                    self._df.path.isin(deleted_lst)
+                    | self._df.path.str.startswith(prefix_tuple)
+                )
+            ]
+        if len(changed_lst) != 0:
+            entry_lst = []
+            for p in changed_lst:
+                entry = self._get_lst_entry_from_path(entry=p)
+                if len(entry) != 0:
+                    entry_lst.append(entry)
+                    if entry[3]:
+                        entry_lst += list(
+                            self._scandir(path=p, df=None, recursive=True)
+                        )
+            df_updated = self._create_df_from_lst(entry_lst)
+            if len(df_updated) != 0:
+                self._df = self._df[~self._df.path.isin(df_updated.path)]
+                self._df = (
+                    pandas.concat([self._df, df_updated])
+                    .drop_duplicates()
+                    .reset_index(drop=True)
+                )
 
     def _get_changes_quick(self) -> tuple:
         """
