@@ -39,9 +39,7 @@ class PyFileIndex:
         self._pending_changes: set = set()
         self._watch_stop_event: Optional[threading.Event] = None
         self._watch_thread: Optional[threading.Thread] = None
-        self._watch_generator: Optional[
-            Generator[set[tuple], None, None]
-        ] = None
+        self._watch_generator: Optional[Generator[set[tuple], None, None]] = None
         if watch:
             self._start_watch()
         if df is None:
