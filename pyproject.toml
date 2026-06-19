@@ -31,9 +31,11 @@ classifiers = [
 ]
 dependencies = [
     "pandas==3.0.3",
-    "watchfiles==1.2.0",
 ]
 dynamic = ["version"]
+
+[project.optional-dependencies]
+watchfiles = ["watchfiles==1.2.0"]
 
 [project.urls]
 Homepage = "https://github.com/pyiron/pyfileindex"

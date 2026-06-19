@@ -5,7 +5,6 @@ from collections.abc import Generator
 from typing import Callable, Optional
 
 import pandas
-import watchfiles
 
 
 class PyFileIndex:
@@ -232,6 +231,8 @@ class PyFileIndex:
         after construction, the generator is advanced once synchronously here
         before the background thread takes over.
         """
+        import watchfiles
+
         self._watch_stop_event = threading.Event()
         self._watch_generator = watchfiles.watch(
             self._path,
@@ -281,6 +282,8 @@ class PyFileIndex:
         Args:
             changes (set): set of (watchfiles.Change, path) tuples
         """
+        import watchfiles
+
         if len(changes) == 0:
             return
         deleted_lst = [
