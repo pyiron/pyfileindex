@@ -153,6 +153,41 @@ class TestPyFileIndexWatch(unittest.TestCase):
         finally:
             os.rmdir(sub_dir)
 
+    def test_open_backfills_files_missed_by_stale_parent_snapshot(self):
+        """
+        Regression test for a permanent-loss race: open() hands the child a
+        snapshot filtered from the parent's dataframe, which can be stale if
+        the parent's background watcher has not drained a recent change yet.
+        A freshly started child watcher only reports changes from the moment
+        it starts, so if the child trusted that stale snapshot instead of
+        scanning the directory itself, a file that already existed before
+        the child started watching would be permanently invisible to it --
+        no amount of retrying update() afterwards would ever recover it.
+        """
+        sub_dir = os.path.join(self.path, "sub_stale")
+        os.makedirs(sub_dir)
+        nested_file = os.path.join(sub_dir, "nested.txt")
+        touch(nested_file)
+
+        # Simulate the parent's watcher not having drained the change yet by
+        # making its update() a no-op for the duration of open(), so the
+        # parent's df does not contain `nested_file` (or even `sub_dir`)
+        # when it gets filtered for the child.
+        with patch.object(self.fi, "update", lambda timeout=0.1: None):
+            self.assertNotIn(sub_dir, self.fi.df.path.values)
+            fi_sub = self.fi.open(sub_dir)
+        try:
+            self.assertIn(
+                nested_file,
+                fi_sub.df.path.values,
+                msg="open() must not rely solely on a (possibly stale) "
+                "snapshot filtered from the parent's dataframe -- a freshly "
+                "started child watcher can never backfill a file that "
+                "already existed before it started watching.",
+            )
+        finally:
+            fi_sub.close()
+
 
 class TestApplyWatchChanges(unittest.TestCase):
     @classmethod
