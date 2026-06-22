@@ -78,6 +78,13 @@ class FileSystemWatcher:
         arrive (or for the timeout to elapse) before returning, without
         blocking any longer than necessary.
 
+        Unrelated changes collected by an earlier, undrained call already
+        leave the "changes available" signal set, which would otherwise let
+        a caller's wait return immediately even though the change it is
+        actually waiting for is still in flight. The signal is therefore
+        cleared before waiting, so a timeout > 0 always gives the background
+        thread a real chance to deliver the latest change.
+
         Args:
             timeout (float): max time in seconds to wait for a pending
                 change to arrive if none is available yet (optional)
@@ -86,6 +93,7 @@ class FileSystemWatcher:
             set: set of (watchfiles.Change, path) tuples
         """
         if timeout > 0:
+            self._changes_available.clear()
             self._changes_available.wait(timeout)
         with self._lock:
             changes = self._pending_changes
