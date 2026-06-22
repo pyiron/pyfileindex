@@ -1,3 +1,4 @@
+import atexit
 import threading
 from collections.abc import Generator
 from typing import Optional
@@ -11,6 +12,16 @@ class FileSystemWatcher:
 
     watchfiles is an optional dependency of pyfileindex: importing this
     module never requires it, only start() does.
+
+    Callers that hold a watcher alive for the lifetime of the process (e.g.
+    via a path-keyed singleton cache) may never trigger its __del__ during
+    normal execution -- it would only run during interpreter shutdown, by
+    which point CPython may already be tearing down the modules and C-API
+    state that the background thread's native extension depends on, which
+    can crash the process instead of cleanly joining the thread. start()
+    therefore registers stop() with atexit, so every watcher is joined
+    while the interpreter is still fully intact, before that teardown
+    begins.
 
     Args:
         path (str): file system path to watch
@@ -53,12 +64,14 @@ class FileSystemWatcher:
             next(self._generator)
         self._thread = threading.Thread(target=self._worker, daemon=True)
         self._thread.start()
+        atexit.register(self.stop)
 
     def stop(self) -> None:
         """
         Stop the background file system watcher. Safe to call even if no
         watcher is running.
         """
+        atexit.unregister(self.stop)
         if self._stop_event is not None:
             self._stop_event.set()
         if self._thread is not None:
