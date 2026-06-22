@@ -40,7 +40,12 @@ class PyFileIndex:
         if watch:
             self._watcher = FileSystemWatcher(path=self._path)
             self._watcher.start()
-        if df is None:
+        if df is None or watch:
+            # A df handed down from a parent index (e.g. via open()) can be
+            # stale: the parent's watcher may not have drained changes made
+            # to this path yet, and a freshly started watcher here only
+            # reports changes from now on, so a missing entry would never be
+            # backfilled. Scanning is cheap relative to that permanent loss.
             self._df = self._create_df_from_lst(
                 [self._get_lst_entry_from_path(entry=self._path)]
                 + list(self._scandir(path=self._path, df=None, recursive=True))
