@@ -3,7 +3,7 @@ PyFileIndex - pythonic file system index
 
 [![Pipeline](https://github.com/pyiron/pyfileindex/actions/workflows/pipeline.yml/badge.svg)](https://github.com/pyiron/pyfileindex/actions/workflows/pipeline.yml)
 [![codecov](https://codecov.io/gh/pyiron/pyfileindex/graph/badge.svg?token=J9EWZBBKPH)](https://codecov.io/gh/pyiron/pyfileindex)
-[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/pyiron/pyfileindex/main?filepath=notebooks%2Fdemo.ipynb)
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/pyiron/pyfileindex/main?filepath=notebooks%2Fgetting_started.ipynb)
 
 The pyfileindex helps to keep track of files in a specific directory, to monitor added files, modified files and deleted files. The module is compatible with Python 3.7 or later but restricted to Unix-like system - Windows is not supported. 
 
@@ -44,7 +44,7 @@ And open a subdirectory using:
 ```python
 pfi.open(path='subdirectory')
 ```
-For more details, take a look at the example notebook: https://github.com/pyiron/pyfileindex/blob/main/notebooks/demo.ipynb
+For more details, take a look at the example notebook: https://github.com/pyiron/pyfileindex/blob/main/notebooks/getting_started.ipynb
 
 
 # License
