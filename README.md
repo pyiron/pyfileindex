@@ -9,7 +9,7 @@ The pyfileindex helps to keep track of files in a specific directory, to monitor
 
 ![Preview](https://raw.githubusercontent.com/pyiron/pyfileindex/main/pyfileindex.gif)
 
-# Installation
+## Installation
 The pyfileindex can either be installed via pip using:
 ```shell
 pip install pyfileindex
@@ -19,7 +19,7 @@ Or via anaconda from the conda-forge channel
 conda install -c conda-forge pyfileindex
 ```
 
-# Usage 
+## Usage 
 Import pyfileindex:
 ```python
 from pyfileindex import PyFileIndex 
@@ -47,7 +47,7 @@ pfi.open(path='subdirectory')
 For more details, take a look at the example notebook: https://github.com/pyiron/pyfileindex/blob/main/notebooks/getting_started.ipynb
 
 
-# License
+## License
 The pyfileindex is released under the BSD license https://github.com/pyiron/pyfileindex/blob/main/LICENSE . It is a spin-off of the pyiron project https://github.com/pyiron/pyiron therefore if you use the pyfileindex for your publication, please cite: 
 ```
 @article{pyiron-paper,
@@ -63,3 +63,16 @@ The pyfileindex is released under the BSD license https://github.com/pyiron/pyfi
   keywords = {Modelling workflow, Integrated development environment, Complex simulation protocols},
 }
 ```
+
+## Documentation
+
+* [pyfileindex](https://pyfileindex.readthedocs.io/en/latest/README.html)
+  * [Installation](https://pyfileindex.readthedocs.io/en/latest/README.html#installation)
+  * [Usage](https://pyfileindex.readthedocs.io/en/latest/README.html#usage)
+  * [License](https://pyfileindex.readthedocs.io/en/readthedocs/README.html#license)
+* [Getting started with pyfileindex](https://pyfileindex.readthedocs.io/en/latest/getting_started.html)
+  * [Setup](https://pyfileindex.readthedocs.io/en/latest/getting_started.html#setup)
+  * [Polling mode](https://pyfileindex.readthedocs.io/en/latest/getting_started.html#polling-mode-watch-false-the-default)
+  * [Watch mode](https://pyfileindex.readthedocs.io/en/latest/getting_started.html#watch-mode-watch-true)
+  * [Using pyfileindex in your own project](https://pyfileindex.readthedocs.io/en/latest/getting_started.html#using-pyfileindex-in-your-own-project)
+* [Interface](https://pyfileindex.readthedocs.io/en/latest/api.html)
