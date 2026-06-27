@@ -36,6 +36,16 @@ List files in the file system index:
 ```python
 pfi.dataframe 
 ```
+Each row is a file or directory below the indexed path:
+
+| Column | Type | Description |
+| --- | --- | --- |
+| `basename` | str | File or directory name, e.g. `output.txt` |
+| `path` | str | Absolute path |
+| `dirname` | str | Absolute path of the parent directory |
+| `is_directory` | bool | `True` for directories, `False` for files |
+| `mtime` | float | Last modification time (POSIX timestamp, same as `os.stat().st_mtime`) |
+| `nlink` | int | Hard link count (`os.stat().st_nlink`), used internally to detect changes |
 Update file system index: 
 ```python
 pfi.update()
