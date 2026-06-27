@@ -18,8 +18,13 @@ class PyFileIndex:
         debug (bool): enable debug print statements (optional)
         df (pandas.DataFrame): DataFrame of a previous PyFileIndex object (optional)
         watch (bool): keep the file index in sync using a background file system
-            watcher instead of rescanning the file system on every update() call
-            (optional)
+            watcher instead of rescanning the file system on every update() call.
+            Relies on OS-level file change notifications (via the optional
+            watchfiles dependency), which are not always delivered reliably on
+            network filesystems such as NFS, Lustre, or GPFS when the change is
+            made by a different node -- a common setup when monitoring HPC
+            simulation output from a separate process or login node. Prefer the
+            default polling mode (watch=False) in that case (optional)
     """
 
     def __init__(
@@ -55,10 +60,29 @@ class PyFileIndex:
 
     @property
     def df(self) -> pandas.DataFrame:
+        """
+        The file index as a pandas DataFrame, with one row per file or
+        directory below the indexed path. Columns:
+
+        - ``basename`` (str): file or directory name, e.g. ``"output.txt"``.
+        - ``path`` (str): absolute path.
+        - ``dirname`` (str): absolute path of the parent directory.
+        - ``is_directory`` (bool): ``True`` for directories, ``False`` for files.
+        - ``mtime`` (float): last modification time as a POSIX timestamp (the
+          same value ``os.stat().st_mtime`` returns). Useful for finding which
+          simulation directories have written output most recently.
+        - ``nlink`` (int): hard link count (``os.stat().st_nlink``). Used
+          internally to detect changes that don't update ``mtime``; rarely
+          needed directly.
+
+        Returns:
+            pandas.DataFrame: the file index
+        """
         return self._df
 
     @property
     def dataframe(self) -> pandas.DataFrame:
+        """Alias for :attr:`df`."""
         return self.df
 
     def open(self, path: str) -> "PyFileIndex":
