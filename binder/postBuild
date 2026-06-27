@@ -2,4 +2,4 @@ pip install . --no-deps --no-build-isolation
 
 cp notebooks/getting_started.ipynb .
 
-rm -r .ci_support .github binder docs src tests .gitattributes .gitignore .pre-commit-config.yaml .readthedocs.yaml CODE_OF_CONDUCT.md LICENSE MANIFEST.in README.md pyfileindex.gif pyproject.toml
+rm -r .ci_support .github binder docs src tests .gitattributes .gitignore .pre-commit-config.yaml .readthedocs.yaml CODE_OF_CONDUCT.md LICENSE MANIFEST.in README.md pyfileindex.gif pyproject.toml notebooks
