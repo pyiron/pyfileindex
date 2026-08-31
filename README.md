@@ -22,19 +22,21 @@ conda install -c conda-forge pyfileindex
 ## Usage 
 Import pyfileindex:
 ```python
-from pyfileindex import PyFileIndex 
-pfi = PyFileIndex(path='.')
+from pyfileindex import PyFileIndex
+
+pfi = PyFileIndex(path=".")
 ```  
 Or you can filter for a specifc file extension: 
 ```python
 def filter_function(file_name):
-    return '.txt' in file_name
-    
-pfi = PyFileIndex(path='.', filter_function=filter_function)
+    return ".txt" in file_name
+
+
+pfi = PyFileIndex(path=".", filter_function=filter_function)
 ```
 List files in the file system index: 
 ```python
-pfi.dataframe 
+pfi.dataframe
 ```
 Each row is a file or directory below the indexed path:
 
@@ -52,7 +54,7 @@ pfi.update()
 ```
 And open a subdirectory using: 
 ```python
-pfi.open(path='subdirectory')
+pfi.open(path="subdirectory")
 ```
 For more details, take a look at the example notebook: https://github.com/pyiron/pyfileindex/blob/main/notebooks/getting_started.ipynb
 
