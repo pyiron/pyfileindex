@@ -2,7 +2,7 @@
 requires = [
     "hatchling==1.32.4",
     "hatch-vcs==0.5.0",
-    "pandas",
+    "pandas>=1.5.3,<=3.0.6",
 ]
 build-backend = "hatchling.build"
 
