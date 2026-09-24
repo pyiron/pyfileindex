@@ -1,4 +1,4 @@
-name: Weekly upper-bound update
+name: Daily upper-bound update
 
 # Refreshes the `upper*` Pixi environments to the newest conda-forge
 # versions available, testing each direct dependency independently so one
@@ -8,7 +8,7 @@ name: Weekly upper-bound update
 
 on:
   schedule:
-    - cron: "0 5 * * 1"  # every Monday
+    - cron: "0 5 * * *"  #  every day
   workflow_dispatch: {}
 
 env:
@@ -82,10 +82,10 @@ jobs:
         commit-message: "Update upper dependency bounds"
         branch: weekly-upper-update
         delete-branch: true
-        title: "Weekly upper dependency update"
+        title: "Daily upper dependency update"
         labels: dependencies
         body: |
-          Automated weekly refresh of the `upper*` Pixi environments (`pixi.lock` only).
+          Automated daily refresh of the `upper*` Pixi environments (`pixi.lock` only).
 
           Advanced:${{ env.ADVANCED }}
 
