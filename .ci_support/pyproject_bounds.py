@@ -6,7 +6,9 @@ and the upper bound is the newest version tested by the ``upper-py*``
 environments. This script reads those resolved, locked environments (via
 ``pixi list --explicit --json``) and writes ``name>=LOWER,<=UPPER`` into
 ``[project.dependencies]`` / ``[project.optional-dependencies]`` of
-pyproject.toml.
+pyproject.toml - and into any entry of ``[build-system] requires`` that
+names the same dependency, so the build-time pin doesn't drift from the
+runtime one.
 
 See docs/dependency_policy.md for the full policy.
 """
@@ -111,24 +113,38 @@ def resolved_ranges(names, lower_versions, upper_versions_by_environment):
     return ranges
 
 
+def _apply_ranges(requirements, ranges):
+    """Replace, in place, every entry of `requirements` whose name is in `ranges`."""
+    for i, req in enumerate(requirements):
+        name = Requirement(req).name
+        if name in ranges:
+            requirements[i] = ranges[name]
+
+
 def update_pyproject(doc, ranges):
-    """Rewrite `[project.dependencies]` / `[project.optional-dependencies]` in place."""
+    """Rewrite `[project.dependencies]`, `[project.optional-dependencies]`, and
+    any matching entries of `[build-system] requires` in place.
+
+    `[build-system] requires` is a separate, hand-authored list (it pins the
+    *build-time* backend, not the package's runtime dependencies), but where
+    it happens to name one of the project's own direct dependencies (e.g.
+    `pandas`, needed by hatch-vcs' version detection at build time), that
+    entry is kept in sync with the same validated range so it doesn't drift.
+    """
     project = doc["project"]
 
     dependencies = project.get("dependencies")
     if dependencies is not None:
-        for i, req in enumerate(dependencies):
-            name = Requirement(req).name
-            if name in ranges:
-                dependencies[i] = ranges[name]
+        _apply_ranges(dependencies, ranges)
 
     optional_dependencies = project.get("optional-dependencies")
     if optional_dependencies is not None:
         for reqs in optional_dependencies.values():
-            for i, req in enumerate(reqs):
-                name = Requirement(req).name
-                if name in ranges:
-                    reqs[i] = ranges[name]
+            _apply_ranges(reqs, ranges)
+
+    build_requires = doc.get("build-system", {}).get("requires")
+    if build_requires is not None:
+        _apply_ranges(build_requires, ranges)
 
     return doc
 
