@@ -3,3 +3,4 @@ root: README
 chapters:
 - file: getting_started.ipynb
 - file: api.rst
+- file: dependency_policy.md

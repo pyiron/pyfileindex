@@ -19,21 +19,22 @@ jobs:
       id-token: write
     steps:
     - uses: actions/checkout@v4
-    - name: Conda config
-      run: echo -e "channels:\n  - conda-forge\n" > .condarc
-    - uses: conda-incubator/setup-miniconda@v3
+    - uses: prefix-dev/setup-pixi@v0.10.2
       with:
-        python-version: "3.13"
-        miniforge-version: latest
-        condarc-file: .condarc
-        environment-file: .ci_support/environment.yml
-    - name: Convert dependencies
+        pixi-version: v0.81.0
+        cache: true
+        environments: lower upper-py311 upper-py312 upper-py313 upper-py314 dev
+        locked: true
+    - name: Generate dependency bounds from the validated lower/upper environments
+      # Fails the release if a direct dependency is missing from lower/upper,
+      # lower > upper, or the upper environments disagree on a version - see
+      # .ci_support/pyproject_bounds.py and docs/dependency_policy.md. This
+      # never touches pixi.lock, only pyproject.toml's published ranges.
       run: |
-        cp .ci_support/environment-old.yml environment.yml
-        python .ci_support/release.py; cat pyproject.toml
+        pixi run generate-bounds
+        cat pyproject.toml
         git update-index --assume-unchanged pyproject.toml src/pyfileindex/_version.py
     - name: Build
-      shell: bash -l {0}
-      run: hatchling build -t sdist -t wheel
+      run: pixi run -e dev hatchling build -t sdist -t wheel
     - name: Publish distribution 📦 to PyPI
       uses: pypa/gh-action-pypi-publish@release/v1

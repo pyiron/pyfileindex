@@ -1,0 +1,97 @@
+name: Weekly upper-bound update
+
+# Refreshes the `upper*` Pixi environments to the newest conda-forge
+# versions available, testing each direct dependency independently so one
+# broken upgrade (e.g. pandas) doesn't block unrelated ones (e.g. numpy) -
+# see docs/dependency_policy.md. This only updates pixi.lock; it never
+# touches pyproject.toml's published dependency ranges.
+
+on:
+  schedule:
+    - cron: "0 5 * * 1"  # every Monday
+  workflow_dispatch: {}
+
+env:
+  PIXI_VERSION: v0.81.0
+  UPPER_ENVIRONMENTS: upper-py311 upper-py312 upper-py313 upper-py314
+
+jobs:
+  update-upper:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+    - uses: actions/checkout@v4
+    - uses: prefix-dev/setup-pixi@v0.10.2
+      with:
+        pixi-version: ${{ env.PIXI_VERSION }}
+        cache: true
+        environments: upper-py311 upper-py312 upper-py313 upper-py314 dev
+        locked: true
+
+    - name: Update each direct dependency independently
+      run: |
+        set -euo pipefail
+        names=$(pixi run -e dev python .ci_support/list_pixi_dependencies.py)
+        advanced=""
+        stuck=""
+        for pkg in $names; do
+          echo "::group::$pkg"
+          cp pixi.lock pixi.lock.bak
+          for env in $UPPER_ENVIRONMENTS; do
+            pixi update "$pkg" --environment "$env"
+          done
+
+          if diff -q pixi.lock pixi.lock.bak > /dev/null; then
+            echo "$pkg is already at the newest compatible version"
+            rm pixi.lock.bak
+            echo "::endgroup::"
+            continue
+          fi
+
+          ok=true
+          for env in $UPPER_ENVIRONMENTS; do
+            pixi run -e "$env" test || ok=false
+          done
+
+          if [ "$ok" = true ]; then
+            echo "$pkg: tests passed, keeping the update"
+            advanced="$advanced $pkg"
+            rm pixi.lock.bak
+          else
+            echo "::warning::$pkg: tests failed, reverting to the previous validated version"
+            mv pixi.lock.bak pixi.lock
+            stuck="$stuck $pkg"
+          fi
+          echo "::endgroup::"
+        done
+        echo "ADVANCED=$advanced" >> "$GITHUB_ENV"
+        echo "STUCK=$stuck" >> "$GITHUB_ENV"
+
+    - name: Check whether pixi.lock changed
+      id: diff
+      run: |
+        git diff --quiet -- pixi.lock && echo "changed=false" >> "$GITHUB_OUTPUT" || echo "changed=true" >> "$GITHUB_OUTPUT"
+
+    - name: Open a pull request with the validated updates
+      if: steps.diff.outputs.changed == 'true'
+      uses: peter-evans/create-pull-request@v7
+      with:
+        token: ${{ secrets.DEPENDABOT_WORKFLOW_TOKEN }}
+        commit-message: "Update upper dependency bounds"
+        branch: weekly-upper-update
+        delete-branch: true
+        title: "Weekly upper dependency update"
+        labels: dependencies
+        body: |
+          Automated weekly refresh of the `upper*` Pixi environments (`pixi.lock` only).
+
+          Advanced:${{ env.ADVANCED }}
+
+          Kept at the previous validated version because tests failed:${{ env.STUCK }}
+
+          This does **not** change `pyproject.toml`'s published dependency
+          ranges. Those are only updated by `pixi run generate-bounds` ahead
+          of a release, once the new upper versions have been on `main` and
+          soaked for a while. See docs/dependency_policy.md.

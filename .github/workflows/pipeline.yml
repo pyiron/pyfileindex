@@ -5,6 +5,9 @@ on:
     branches: [ main ]
   pull_request:
 
+env:
+  PIXI_VERSION: v0.81.0
+
 jobs:
   black:
     runs-on: ubuntu-latest
@@ -57,27 +60,39 @@ jobs:
       - name: Test
         run: mypy --ignore-missing-imports src/${{ github.event.repository.name }}
 
+  # Validates that pyproject.toml's published dependency range is
+  # satisfiable by pip/uv from PyPI alone (independent of the conda-forge
+  # resolution pixi uses), and that the built package is pip-check clean.
   pip_check:
     needs: [black]
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
-    - name: Conda config
-      run: echo -e "channels:\n  - conda-forge\n" > .condarc
-    - uses: conda-incubator/setup-miniconda@v3
+    - uses: prefix-dev/setup-pixi@v0.10.2
       with:
-        python-version: "3.13"
-        miniforge-version: latest
-        condarc-file: .condarc
-        environment-file: .ci_support/environment.yml
-    - name: Setup
-      shell: bash -l {0}
-      run: |
-        pip install tomlkit
-        python .ci_support/check.py
-        cat pyproject.toml
-        pip install . --no-deps --no-build-isolation
-        pip check
+        pixi-version: ${{ env.PIXI_VERSION }}
+        cache: true
+        environments: dev
+        locked: true
+    - name: pip check
+      run: pixi run -e dev pip check
+
+  # Fails if pyproject.toml's dependency bounds don't match what the
+  # validated `lower`/`upper` Pixi environments actually resolved - see
+  # docs/dependency_policy.md.
+  bounds_check:
+    needs: [black]
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - uses: prefix-dev/setup-pixi@v0.10.2
+      with:
+        pixi-version: ${{ env.PIXI_VERSION }}
+        cache: true
+        environments: lower upper-py311 upper-py312 upper-py313 upper-py314 dev
+        locked: true
+    - name: Check dependency bounds
+      run: pixi run check-bounds
 
   uv_check:
     needs: [black]
@@ -96,20 +111,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
-    - name: Conda config
-      shell: bash -l {0}
-      run: echo -e "channels:\n  - conda-forge\n" > .condarc
-    - uses: conda-incubator/setup-miniconda@v3
+    - uses: prefix-dev/setup-pixi@v0.10.2
       with:
-        python-version: '3.14'
-        miniforge-version: latest
-        condarc-file: .condarc
-        environment-file: .ci_support/environment-mini.yml
+        pixi-version: ${{ env.PIXI_VERSION }}
+        cache: true
+        environments: mini
+        locked: true
     - name: Test
-      shell: bash -l {0}
-      run: |
-        pip install . --no-deps --no-build-isolation
-        python -m unittest discover tests
+      run: pixi run -e mini test
 
   unittest_matrix:
     needs: [black]
@@ -118,86 +127,75 @@ jobs:
       matrix:
         include:
         - operating-system: macos-latest
-          python-version: '3.14'
+          environment: upper-py314
           label: osx-64-py-3-14
 
         - operating-system: ubuntu-24.04-arm
-          python-version: '3.14'
+          environment: upper-py314
           label: linux-arm-24-py-3-14
 
         - operating-system: ubuntu-22.04-arm
-          python-version: '3.14'
+          environment: upper-py314
           label: linux-arm-22-py-3-14
 
         - operating-system: windows-latest
-          python-version: '3.14'
+          environment: upper-py314
           label: win-64-py-3-14
 
         - operating-system: ubuntu-latest
-          python-version: '3.14'
+          environment: upper-py314
           label: linux-64-py-3-14
 
         - operating-system: ubuntu-latest
-          python-version: '3.13'
+          environment: upper-py313
           label: linux-64-py-3-13
 
         - operating-system: ubuntu-latest
-          python-version: '3.12'
+          environment: upper-py312
           label: linux-64-py-3-12
 
         - operating-system: ubuntu-latest
-          python-version: '3.11'
+          environment: upper-py311
           label: linux-64-py-3-11
 
     steps:
     - uses: actions/checkout@v4
-    - name: Conda config
-      shell: bash -l {0}
-      run: echo -e "channels:\n  - conda-forge\n" > .condarc
-    - uses: conda-incubator/setup-miniconda@v3
+    - uses: prefix-dev/setup-pixi@v0.10.2
       with:
-        python-version: ${{ matrix.python-version }}
-        miniforge-version: latest
-        condarc-file: .condarc
-        environment-file: .ci_support/environment.yml
+        pixi-version: ${{ env.PIXI_VERSION }}
+        cache: true
+        environments: ${{ matrix.environment }}
+        locked: true
     - name: Test
-      shell: bash -l {0}
-      run: |
-        pip install . --no-deps --no-build-isolation
-        coverage run
-        coverage xml
+      run: pixi run -e ${{ matrix.environment }} test
     - name: Upload coverage reports to Codecov
       if: matrix.label == 'linux-64-py-3-12'
       uses: codecov/codecov-action@v5
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
 
-  unittest_old:
+  # oldest supported dependency versions - see docs/dependency_policy.md
+  unittest_lower:
     needs: [black]
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
-    - name: Conda config
-      run: echo -e "channels:\n  - conda-forge\n" > .condarc
-    - uses: conda-incubator/setup-miniconda@v3
+    - uses: prefix-dev/setup-pixi@v0.10.2
       with:
-        python-version: '3.9'
-        miniforge-version: latest
-        condarc-file: .condarc
-        environment-file: .ci_support/environment-old.yml
+        pixi-version: ${{ env.PIXI_VERSION }}
+        cache: true
+        environments: lower
+        locked: true
     - name: Test
-      shell: bash -l {0}
-      run: |
-        pip install . --no-deps --no-build-isolation
-        python -m unittest discover tests
+      run: pixi run -e lower test
 
   autobot:
-    needs: [uv_check, unittest_old, unittest_matrix, pip_check, mypy, minimal]
+    needs: [uv_check, unittest_lower, unittest_matrix, pip_check, bounds_check, mypy, minimal]
     permissions:
       contents: write
       pull-requests: write
     runs-on: ubuntu-latest
-    if: (github.event.pull_request.user.login == 'dependabot[bot]' || github.event.pull_request.user.login == 'pre-commit-ci[bot]')
+    if: (github.event.pull_request.user.login == 'pre-commit-ci[bot]')
     steps:
       - name: Enable auto-merge for bot PRs
         run: gh pr merge --auto --squash "$PR_URL"
