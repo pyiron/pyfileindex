@@ -30,12 +30,12 @@ classifiers = [
     "Programming Language :: Python :: 3.14",
 ]
 dependencies = [
-    "pandas==3.0.6",
+    "pandas>=1.5.3,<=3.0.6",
 ]
 dynamic = ["version"]
 
 [project.optional-dependencies]
-watchfiles = ["watchfiles==1.3.0"]
+watchfiles = ["watchfiles>=1.0.4,<=1.3.0"]
 
 [project.urls]
 Homepage = "https://github.com/pyiron/pyfileindex"
@@ -98,3 +98,111 @@ path = "src/pyfileindex/_version.py"
 [tool.coverage.run]
 source = ["pyfileindex"]
 command_line = "-m unittest discover tests"
+
+# --------------------------------------------------------------------------
+# Pixi dependency management
+#
+# `[tool.pixi.dependencies]` pins the tested *lower* bound of every direct
+# dependency as an open-ended conda requirement (e.g. `>=1.5.3`). The two
+# extremes of that requirement are what get tested in CI:
+#   - the `lower` environment solves with `solve-strategy = "lowest-direct"`,
+#     picking the oldest version satisfying the bound.
+#   - the `upper*` environments solve with `solve-strategy = "highest"`
+#     (pixi's default), picking the newest available version.
+# The `pyproject-bounds` tool (.ci_support/pyproject_bounds.py) then reads the
+# resolved `lower`/`upper` environments and writes `dependency>=LOWER,<=UPPER`
+# into `[project.dependencies]` / `[project.optional-dependencies]` at
+# release time. See docs/dependency_policy.md for the full policy.
+# --------------------------------------------------------------------------
+[tool.pixi.workspace]
+name = "pyfileindex"
+channels = ["conda-forge"]
+platforms = ["linux-64", "linux-aarch64", "osx-64", "osx-arm64", "win-64"]
+
+[tool.pixi.pypi-dependencies]
+# non-editable: CI should validate the actual built package, matching what
+# gets published, not a source-tree editable install.
+pyfileindex = { path = ".", editable = false }
+
+[tool.pixi.pypi-options]
+# build pyfileindex against the conda-installed hatchling/hatch-vcs below
+# instead of resolving build-system.requires from PyPI - this lets the
+# `lower` environment build with an old, Python-3.9-compatible hatchling.
+no-build-isolation = ["pyfileindex"]
+
+[tool.pixi.dependencies]
+pandas = ">=1.5.3"
+hatchling = ">=1.27.0"
+hatch-vcs = ">=0.4.0"
+
+[tool.pixi.feature.wf.dependencies]
+watchfiles = ">=1.0.4"
+
+# oldest supported versions - updated deliberately, see docs/dependency_policy.md
+[tool.pixi.feature.lower]
+solve-strategy = "lowest-direct"
+
+[tool.pixi.feature.lower.dependencies]
+python = "3.9.*"
+
+# newest CI-validated versions - refreshed by the weekly update workflow
+[tool.pixi.feature.upper]
+solve-strategy = "highest"
+
+[tool.pixi.feature.py311.dependencies]
+python = "3.11.*"
+
+[tool.pixi.feature.py312.dependencies]
+python = "3.12.*"
+
+[tool.pixi.feature.py313.dependencies]
+python = "3.13.*"
+
+[tool.pixi.feature.py314.dependencies]
+python = "3.14.*"
+
+[tool.pixi.feature.mini]
+solve-strategy = "highest"
+
+[tool.pixi.feature.mini.dependencies]
+python = "3.14.*"
+
+[tool.pixi.feature.test.dependencies]
+coverage = "*"
+
+[tool.pixi.feature.test.tasks]
+test = "coverage run && coverage xml"
+
+[tool.pixi.feature.unittest.tasks]
+test = "python -m unittest discover tests"
+
+[tool.pixi.feature.dev.dependencies]
+tomlkit = "*"
+packaging = "*"
+pip = "*"
+
+[tool.pixi.feature.dev.tasks]
+generate-bounds = "python .ci_support/pyproject_bounds.py"
+check-bounds = "python .ci_support/pyproject_bounds.py --check"
+
+# Read the Docs build - see .readthedocs.yaml, which invokes these tasks
+# through `pixi run -e docs`. Not part of the compatibility-tested matrix.
+[tool.pixi.feature.docs.dependencies]
+myst-parser = "*"
+nbsphinx = "*"
+sphinx = "*"
+sphinx_rtd_theme = "*"
+jupyter-book = "==1.0.0"
+
+[tool.pixi.feature.docs.tasks]
+docs-prepare = "cp README.md docs && cp notebooks/*.ipynb docs && jupyter-book config sphinx docs/"
+
+[tool.pixi.environments]
+lower = { features = ["lower", "wf", "unittest"] }
+upper-py311 = { features = ["upper", "py311", "wf", "test"] }
+upper-py312 = { features = ["upper", "py312", "wf", "test"] }
+upper-py313 = { features = ["upper", "py313", "wf", "test"] }
+upper-py314 = { features = ["upper", "py314", "wf", "test"] }
+mini = { features = ["mini", "unittest"] }
+dev = { features = ["upper", "py313", "wf", "test", "dev"] }
+docs = { features = ["py313", "docs"] }
