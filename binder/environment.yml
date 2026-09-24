@@ -1,8 +1,0 @@
-channels:
-- conda-forge
-dependencies:
-- python =3.13
-- hatchling =1.32.4
-- hatch-vcs =0.5.0
-- pandas =3.0.5
-- watchfiles =1.2.0

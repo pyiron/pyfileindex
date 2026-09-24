@@ -1,0 +1,9 @@
+#!/bin/bash
+# Install pixi locally if not present, then run install
+curl -fsSL https://pixi.sh/install.sh | bash
+export PATH="$HOME/.pixi/bin:$PATH"
+pixi add -e upper-py314 ipykernel
+pixi install -e upper-py314
+
+jupyter kernelspec remove python3 -y
+/home/jovyan/.pixi/envs/upper-py314/bin/python -m ipykernel install --user --name python3
