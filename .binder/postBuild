@@ -5,4 +5,5 @@ export PATH="$HOME/.pixi/bin:$PATH"
 pixi add -e upper-py314 ipykernel
 pixi install -e upper-py314
 
-/home/jovyan/.pixi/envs/upper-py314/bin/python -m ipykernel install --user --name pixi
+jupyter kernelspec remove python3 -y
+/home/jovyan/.pixi/envs/upper-py314/bin/python -m ipykernel install --user --name python3
