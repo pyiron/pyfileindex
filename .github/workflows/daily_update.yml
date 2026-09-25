@@ -39,9 +39,21 @@ jobs:
         for pkg in $names; do
           echo "::group::$pkg"
           cp pixi.lock pixi.lock.bak
+          ok=true
           for env in $UPPER_ENVIRONMENTS; do
-            pixi update "$pkg" --environment "$env"
+            if ! pixi update "$pkg" --environment "$env"; then
+              echo "::warning::$pkg: update could not be solved, reverting to the previous validated version"
+              mv pixi.lock.bak pixi.lock
+              stuck="$stuck $pkg"
+              ok=false
+              break
+            fi
           done
+
+          if [ "$ok" = false ]; then
+            echo "::endgroup::"
+            continue
+          fi
 
           if diff -q pixi.lock pixi.lock.bak > /dev/null; then
             echo "$pkg is already at the newest compatible version"
@@ -50,7 +62,6 @@ jobs:
             continue
           fi
 
-          ok=true
           for env in $UPPER_ENVIRONMENTS; do
             pixi run -e "$env" test || ok=false
           done
